@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Life OS">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Eby's Life OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --bg2: #111111;
+  --bg3: #1a1a1a;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.15);
+  --text: #f0ede8;
+  --text2: #888880;
+  --text3: #555550;
+  --gold: #c9a84c;
+  --gold2: #8a6f2e;
+  --red: #c0392b;
+  --green: #27ae60;
+  --blue: #2980b9;
+  --orange: #d35400;
+  --safe-top: env(safe-area-inset-top);
+  --safe-bottom: env(safe-area-inset-bottom);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER */
+.header {
+  padding: calc(var(--safe-top) + 16px) 20px 16px;
+  border-bottom: 0.5px solid var(--border);
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+
+.logo span { color: var(--gold); }
+
+.day-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--gold);
+  border: 0.5px solid var(--gold2);
+  padding: 4px 10px;
+  border-radius: 99px;
+  letter-spacing: 0.5px;
+}
+
+/* NAV TABS */
+.nav {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.nav::-webkit-scrollbar { display: none; }
+
+.nav-tab {
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text3);
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 1.5px solid transparent;
+  transition: all 0.2s;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.nav-tab.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+  font-weight: 500;
+}
+
+/* CONTENT */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 16px calc(var(--safe-bottom) + 80px);
+}
+
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* CARDS */
+.card {
+  background: var(--bg2);
+  border: 0.5px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.card-label {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text3);
+  margin-bottom: 6px;
+}
+
+.card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  color: var(--text);
+  margin-bottom: 12px;
+  line-height: 1.3;
+}
+
+/* STATS ROW */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.stat-box {
+  background: var(--bg3);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.stat-label { font-size: 10px; color: var(--text3); margin-bottom: 4px; }
+.stat-value { font-size: 20px; font-weight: 500; color: var(--text); font-family: 'DM Mono', monospace; }
+.stat-sub { font-size: 10px; color: var(--text3); margin-top: 2px; }
+.stat-sub.up { color: var(--green); }
+.stat-sub.dn { color: var(--red); }
+.stat-sub.gold { color: var(--gold); }
+
+/* PROGRESS BAR */
+.prog-wrap {
+  background: var(--bg3);
+  border-radius: 99px;
+  height: 3px;
+  margin: 8px 0 12px;
+  overflow: hidden;
+}
+.prog-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.5s ease;
+}
+
+/* LIST ITEMS */
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 0.5px solid var(--border);
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.4;
+}
+.list-item:last-child { border-bottom: none; }
+
+.dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.item-tag {
+  font-size: 9px;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 99px;
+  margin-left: auto;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tag-d { background: rgba(39,174,96,0.15); color: #27ae60; }
+.tag-w { background: rgba(41,128,185,0.15); color: #2980b9; }
+.tag-m { background: rgba(201,168,76,0.15); color: var(--gold); }
+.tag-t { background: rgba(192,57,43,0.15); color: var(--red); }
+
+/* CHECKLIST */
+.check-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 0.5px solid var(--border);
+  cursor: pointer;
+  transition: opacity 0.2s;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.check-item:last-child { border-bottom: none; }
+.check-item:active { opacity: 0.7; }
+
+.check-box {
+  width: 20px; height: 20px;
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  transition: all 0.2s;
+}
+
+.check-item.done .check-box {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+}
+
+.check-item.done .check-label {
+  text-decoration: line-through;
+  color: var(--text3);
+}
+
+.check-label { font-size: 13px; color: var(--text2); flex: 1; line-height: 1.4; }
+
+/* INPUTS */
+textarea {
+  width: 100%;
+  background: var(--bg3);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  resize: none;
+  min-height: 100px;
+  margin-bottom: 10px;
+  -webkit-appearance: none;
+}
+textarea:focus { outline: none; border-color: var(--gold2); }
+textarea::placeholder { color: var(--text3); }
+
+/* BUTTONS */
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  background: var(--gold);
+  color: #0a0a0a;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  margin-bottom: 8px;
+}
+.btn-primary:active { opacity: 0.8; }
+
+.btn-secondary {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  color: var(--text2);
+  border: 0.5px solid var(--border2);
+  border-radius: 12px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 8px;
+}
+.btn-secondary:active { background: var(--bg3); }
+
+.btn-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+/* CHAT INTERFACE */
+.chat-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.msg {
+  max-width: 85%;
+  padding: 10px 13px;
+  border-radius: 16px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.msg.user {
+  background: var(--gold);
+  color: #0a0a0a;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+
+.msg.ai {
+  background: var(--bg3);
+  color: var(--text2);
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+  border: 0.5px solid var(--border);
+}
+
+.msg.ai strong { color: var(--text); font-weight: 500; }
+
+.typing {
+  display: flex;
+  gap: 4px;
+  padding: 12px;
+  align-self: flex-start;
+}
+.typing span {
+  width: 6px; height: 6px;
+  background: var(--text3);
+  border-radius: 50%;
+  animation: bounce 1.2s infinite;
+}
+.typing span:nth-child(2) { animation-delay: 0.2s; }
+.typing span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-6px); }
+}
+
+/* PARTNER DOTS */
+.p-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 10px 0;
+}
+.p-dot {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 0.5px solid var(--border2);
+  background: var(--bg3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  color: var(--text3);
+  font-family: 'DM Mono', monospace;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.p-dot.on { background: var(--orange); border-color: var(--orange); color: white; }
+
+/* MILESTONE */
+.ms-item {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 0.5px solid var(--border);
+  align-items: flex-start;
+}
+.ms-item:last-child { border-bottom: none; }
+.ms-day {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--gold);
+  min-width: 48px;
+  padding-top: 1px;
+}
+.ms-text { font-size: 12px; color: var(--text2); line-height: 1.5; flex: 1; }
+.ms-tag {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 99px;
+  background: var(--bg3);
+  color: var(--text3);
+  border: 0.5px solid var(--border);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* WIN CARD */
+.win-card {
+  background: var(--bg3);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+}
+.win-date { font-size: 10px; color: var(--text3); margin-bottom: 3px; font-family: 'DM Mono', monospace; }
+.win-text { font-size: 13px; color: var(--text2); line-height: 1.4; }
+
+/* IDENTITY */
+.identity-quote {
+  border-left: 2px solid var(--gold);
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  background: rgba(201,168,76,0.05);
+  border-radius: 0 12px 12px 0;
+}
+.identity-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px;
+  font-style: italic;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+/* SCORE RING */
+.score-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 0;
+}
+.ring-wrap { position: relative; width: 64px; height: 64px; flex-shrink: 0; }
+.ring-wrap svg { transform: rotate(-90deg); }
+.ring-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+.score-info { flex: 1; }
+.score-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+.score-msg { font-size: 13px; color: var(--text2); line-height: 1.4; }
+
+/* ALERT */
+.alert {
+  padding: 10px 13px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+.alert.warn { background: rgba(211,84,0,0.1); border: 0.5px solid rgba(211,84,0,0.3); color: #e67e22; }
+.alert.info { background: rgba(201,168,76,0.08); border: 0.5px solid var(--gold2); color: var(--gold); }
+.alert.good { background: rgba(39,174,96,0.08); border: 0.5px solid rgba(39,174,96,0.3); color: var(--green); }
+
+/* BOTTOM NAV */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  background: rgba(10,10,10,0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 0.5px solid var(--border);
+  display: flex;
+  padding: 8px 0 calc(var(--safe-bottom) + 8px);
+  z-index: 200;
+}
+
+.bnav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 4px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  background: none;
+  border: none;
+  -webkit-user-select: none;
+}
+.bnav-item:active { opacity: 0.6; }
+
+.bnav-icon { font-size: 20px; line-height: 1; }
+.bnav-label { font-size: 9px; color: var(--text3); font-family: 'DM Sans', sans-serif; }
+.bnav-item.active .bnav-icon { filter: none; }
+.bnav-item.active .bnav-label { color: var(--gold); }
+
+/* SECTION HEADING */
+.section-heading {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text3);
+  margin: 20px 0 10px;
+  font-weight: 500;
+}
+.section-heading:first-child { margin-top: 0; }
+
+/* GOAL HEADER */
+.goal-hdr {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.goal-badge {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 99px;
+  margin-left: 8px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* LOADING */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 16px;
+}
+.loading-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  font-weight: 600;
+  color: var(--text);
+}
+.loading-logo span { color: var(--gold); }
+.loading-sub { font-size: 13px; color: var(--text3); }
+.loading-bar-wrap {
+  width: 120px;
+  height: 1px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.loading-bar {
+  height: 100%;
+  background: var(--gold);
+  border-radius: 99px;
+  animation: loadprog 1.5s ease forwards;
+}
+@keyframes loadprog { from { width: 0; } to { width: 100%; } }
+
+@keyframes fadein {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fadein { animation: fadein 0.3s ease forwards; }
+
+</style>
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div class="loading" id="loadScreen">
+  <div class="loading-logo">Life <span>OS</span></div>
+  <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+  <div class="loading-sub">Loading your system...</div>
+</div>
+
+<!-- MAIN APP -->
+<div class="app" id="mainApp" style="display:none">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <div class="logo">Life <span>OS</span></div>
+      <div class="day-badge" id="dayBadge">Day 1 of 500</div>
+    </div>
+    <div class="nav" id="topNav">
+      <button class="nav-tab active" onclick="showScreen('daily',this)">Daily</button>
+      <button class="nav-tab" onclick="showScreen('goals',this)">Goals</button>
+      <button class="nav-tab" onclick="showScreen('numbers',this)">Numbers</button>
+      <button class="nav-tab" onclick="showScreen('content',this)">Content</button>
+      <button class="nav-tab" onclick="showScreen('attraction',this)">Attraction</button>
+      <button class="nav-tab" onclick="showScreen('milestones',this)">Milestones</button>
+      <button class="nav-tab" onclick="showScreen('wins',this)">Wins</button>
+      <button class="nav-tab" onclick="showScreen('identity',this)">Identity</button>
+    </div>
+  </div>
+
+  <!-- CONTENT AREA -->
+  <div class="content">
+
+    <!-- DAILY SCREEN -->
+    <div class="screen active fadein" id="screen-daily">
+
+      <div class="score-section">
+        <div class="ring-wrap">
+          <svg width="64" height="64" viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="26" fill="none" stroke="#1a1a1a" stroke-width="5"/>
+            <circle cx="32" cy="32" r="26" fill="none" stroke="#c9a84c" stroke-width="5"
+              stroke-dasharray="163.4" stroke-dashoffset="163.4"
+              stroke-linecap="round" id="scoreRing" style="transition:stroke-dashoffset 0.5s ease"/>
+          </svg>
+          <div class="ring-text" id="scoreRingText">0/7</div>
+        </div>
+        <div class="score-info">
+          <div class="score-label">Today's non-negotiables</div>
+          <div class="score-msg" id="scoreMsg">Start your day. Check off each win.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">7 Non-Negotiables</div>
+        <div id="checklist">
+          <div class="check-item" onclick="toggleCheck(this,'eft')">
+            <div class="check-box">✓</div>
+            <div class="check-label">Guided visualisation + EFT (15 min)</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this,'gratitude')">
+            <div class="check-box">✓</div>
+            <div class="check-label">Gratitude + affirmations (5 min)</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this,'read')">
+            <div class="check-box">✓</div>
+            <div class="check-label">Read minimum 5 pages</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this,'workout')">
+            <div class="check-box">✓</div>
+            <div class="check-label">Workout + Kaggle exercises</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this,'revenue')">
+            <div class="check-box">✓</div>
+            <div class="check-label">1 direct revenue action</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this,'content')">
+            <div class="check-box">✓</div>
+            <div class="check-label">Create or publish 1 Malayalam visual story</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this,'connect')">
+            <div class="check-box">✓</div>
+            <div class="check-label">Connect with 1 person intentionally</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Daily Coach — Tell me your day</div>
+        <div class="chat-wrap" id="chatWrap"></div>
+        <textarea id="chatInput" placeholder="How is today looking? Energy, schedule, wins, struggles — tell me anything..." rows="3"></textarea>
+        <button class="btn-primary" onclick="sendChat()">Get today's focus ↗</button>
+        <div class="btn-row">
+          <button class="btn-secondary" onclick="quickPrompt('weekly')">Weekly review</button>
+          <button class="btn-secondary" onclick="quickPrompt('correct')">Course correct</button>
+        </div>
+        <button class="btn-secondary" onclick="quickPrompt('trip')">Plan a trip within my goals ↗</button>
+      </div>
+
+    </div>
+
+    <!-- GOALS SCREEN -->
+    <div class="screen fadein" id="screen-goals">
+
+      <div class="alert warn">Real starting line: ₹50L debt. Phase A = clear debt. Phase B = build ₹100Cr. Everything else runs in parallel.</div>
+
+      <div class="card">
+        <div class="goal-hdr">
+          <div><div class="card-label">Goal 1 — Wealth</div><div class="card-title">₹100 Crore net worth</div></div>
+          <span class="goal-badge" style="background:rgba(39,174,96,0.12);color:#27ae60">₹100Cr</span>
+        </div>
+        <div class="prog-wrap"><div class="prog-fill" style="width:1%;background:#27ae60"></div></div>
+        <ul style="list-style:none">
+          <li class="list-item"><span class="dot" style="background:#27ae60"></span>Scale Adivinar: ₹4L → ₹15L/month<span class="item-tag tag-d">daily</span></li>
+          <li class="list-item"><span class="dot" style="background:#27ae60"></span>First AI automation client — 100 days<span class="item-tag tag-t">urgent</span></li>
+          <li class="list-item"><span class="dot" style="background:#27ae60"></span>Club Catalyst resort — profitable 200 days<span class="item-tag tag-w">weekly</span></li>
+          <li class="list-item"><span class="dot" style="background:#27ae60"></span>Finance 1% — one concept daily<span class="item-tag tag-d">daily</span></li>
+          <li class="list-item"><span class="dot" style="background:#27ae60"></span>Startup investing — after debt cleared<span class="item-tag tag-m">phase B</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="goal-hdr">
+          <div><div class="card-label">Goal 2 — Empire</div><div class="card-title">Master connector + ecosystem builder</div></div>
+          <span class="goal-badge" style="background:rgba(41,128,185,0.12);color:#2980b9">Builder</span>
+        </div>
+        <div class="prog-wrap"><div class="prog-fill" style="width:1%;background:#2980b9"></div></div>
+        <ul style="list-style:none">
+          <li class="list-item"><span class="dot" style="background:#2980b9"></span>BNI Warriors — connect and complete<span class="item-tag tag-d">daily</span></li>
+          <li class="list-item"><span class="dot" style="background:#2980b9"></span>Adivinar internal automation<span class="item-tag tag-d">daily</span></li>
+          <li class="list-item"><span class="dot" style="background:#2980b9"></span>Club Catalyst — 10 resort actions<span class="item-tag tag-d">daily</span></li>
+          <li class="list-item"><span class="dot" style="background:#2980b9"></span>1 event every 60 days<span class="item-tag tag-m">monthly</span></li>
+          <li class="list-item"><span class="dot" style="background:#2980b9"></span>2 new founders/investors weekly<span class="item-tag tag-w">weekly</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="goal-hdr">
+          <div><div class="card-label">Goal 3 — Body & Attraction</div><div class="card-title">Greek god physique · 50-partner pool</div></div>
+          <span class="goal-badge" style="background:rgba(211,84,0,0.12);color:#d35400">Transform</span>
+        </div>
+        <div class="prog-wrap"><div class="prog-fill" style="width:1%;background:#d35400"></div></div>
+        <ul style="list-style:none">
+          <li class="list-item"><span class="dot" style="background:#d35400"></span>Daily workout — physique building<span class="item-tag tag-d">daily</span></li>
+          <li class="list-item"><span class="dot" style="background:#d35400"></span>Kaggle — sexual performance<span class="item-tag tag-d">daily</span></li>
+          <li class="list-item"><span class="dot" style="background:#d35400"></span>Skin care + face exercises<span class="item-tag tag-d">daily</span></li>
+          <li class="list-item"><span class="dot" style="background:#d35400"></span>Fight training — recreational<span class="item-tag tag-w">weekly</span></li>
+          <li class="list-item"><span class="dot" style="background:#d35400"></span>Style upgrade<span class="item-tag tag-m">monthly</span></li>
+          <li class="list-item"><span class="dot" style="background:#d35400"></span>Partner pool — lifestyle-led naturally<span class="item-tag tag-t">500-day</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="goal-hdr">
+          <div><div class="card-label">Goal 4 — Influence</div><div class="card-title">1M+ followers · Malayalam first</div></div>
+          <span class="goal-badge" style="background:rgba(142,68,173,0.12);color:#9b59b6">1M+</span>
+        </div>
+        <div class="prog-wrap"><div class="prog-fill" style="width:0%;background:#9b59b6"></div></div>
+        <ul style="list-style:none">
+          <li class="list-item"><span class="dot" style="background:#9b59b6"></span>Malayalam visual content — Higgsfield<span class="item-tag tag-d">daily</span></li>
+          <li class="list-item"><span class="dot" style="background:#9b59b6"></span>English training — 15 min<span class="item-tag tag-d">daily</span></li>
+          <li class="list-item"><span class="dot" style="background:#9b59b6"></span>Bilingual at Day 180<span class="item-tag tag-m">phase 2</span></li>
+          <li class="list-item"><span class="dot" style="background:#9b59b6"></span>English-led at Day 300<span class="item-tag tag-m">phase 3</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="goal-hdr">
+          <div><div class="card-label">Goal 5 — Life & Clarity</div><div class="card-title">The life people watch in awe</div></div>
+          <span class="goal-badge" style="background:rgba(201,168,76,0.12);color:var(--gold)">Live Big</span>
+        </div>
+        <div class="prog-wrap"><div class="prog-fill" style="width:1%;background:var(--gold)"></div></div>
+        <ul style="list-style:none">
+          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>EFT + visualisation daily<span class="item-tag tag-d">daily</span></li>
+          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>Read 5 pages minimum<span class="item-tag tag-d">daily</span></li>
+          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>Travel — 1 place every 45 days<span class="item-tag tag-m">monthly</span></li>
+          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>Relationship clarity — EFT journaling<span class="item-tag tag-w">weekly</span></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- NUMBERS SCREEN -->
+    <div class="screen fadein" id="screen-numbers">
+
+      <div class="section-heading">Starting point</div>
+      <div class="stats-row">
+        <div class="stat-box"><div class="stat-label">Followers</div><div class="stat-value">157</div><div class="stat-sub dn">→ 1M target</div></div>
+        <div class="stat-box"><div class="stat-label">Revenue/month</div><div class="stat-value">₹4L</div><div class="stat-sub dn">→ ₹15L target</div></div>
+        <div class="stat-box"><div class="stat-label">Net worth</div><div class="stat-value">-₹50L</div><div class="stat-sub dn">debt to clear</div></div>
+        <div class="stat-box"><div class="stat-label">Day</div><div class="stat-value" id="dayNum">1</div><div class="stat-sub gold">of 500</div></div>
+      </div>
+
+      <div class="section-heading">Revenue ladder</div>
+      <div class="card">
+        <ul style="list-style:none">
+          <li class="ms-item"><span class="ms-day">Day 100</span><span class="ms-text">₹4L → ₹7L/month — first AI client + upsells</span></li>
+          <li class="ms-item"><span class="ms-day">Day 200</span><span class="ms-text">₹7L → ₹10L/month — resort + second AI client</span></li>
+          <li class="ms-item"><span class="ms-day">Day 300</span><span class="ms-text">₹10L → ₹15L/month — retainers + SaaS + influence</span></li>
+          <li class="ms-item"><span class="ms-day">Day 500</span><span class="ms-text">₹15L+ compounding — investments, events, brand deals</span></li>
+        </ul>
+      </div>
+
+      <div class="section-heading">Debt clearance rule</div>
+      <div class="card">
+        <div class="alert warn" style="margin-bottom:0">Every ₹1L above ₹4L — 60% goes to debt until cleared. Target: debt-free by Day 300.</div>
+      </div>
+
+      <div class="section-heading">Follower growth</div>
+      <div class="card">
+        <ul style="list-style:none">
+          <li class="ms-item"><span class="ms-day">Day 60</span><span class="ms-text">1K followers</span><span class="ms-tag">Malayalam</span></li>
+          <li class="ms-item"><span class="ms-day">Day 100</span><span class="ms-text">5K followers</span><span class="ms-tag">Malayalam</span></li>
+          <li class="ms-item"><span class="ms-day">Day 200</span><span class="ms-text">10K followers</span><span class="ms-tag">Bilingual</span></li>
+          <li class="ms-item"><span class="ms-day">Day 300</span><span class="ms-text">50K followers</span><span class="ms-tag">English</span></li>
+          <li class="ms-item"><span class="ms-day">Day 450</span><span class="ms-text">500K followers</span><span class="ms-tag">National</span></li>
+          <li class="ms-item"><span class="ms-day">Day 500</span><span class="ms-text">1M+ followers</span><span class="ms-tag">Global</span></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- CONTENT SCREEN -->
+    <div class="screen fadein" id="screen-content">
+
+      <div class="alert info">Malayalam first. Higgsfield is your moat. Most people talk — you show. That's the edge.</div>
+
+      <div class="section-heading">3-phase strategy</div>
+      <div class="card">
+        <ul style="list-style:none">
+          <li class="ms-item"><span class="ms-day">0-180</span><span class="ms-text">Malayalam only — visual stories via Higgsfield. Dominate local market.</span><span class="ms-tag">Now</span></li>
+          <li class="ms-item"><span class="ms-day">180-300</span><span class="ms-text">Bilingual — same content, English subtitles added. Start English voiceover.</span><span class="ms-tag">Phase 2</span></li>
+          <li class="ms-item"><span class="ms-day">300+</span><span class="ms-text">English-led. Malayalam audience already loyal. National reach begins.</span><span class="ms-tag">Phase 3</span></li>
+        </ul>
+      </div>
+
+      <div class="section-heading">Content pillars</div>
+      <div class="card">
+        <ul style="list-style:none">
+          <li class="list-item"><span class="dot" style="background:#9b59b6"></span>The builder — Adivinar, AI, business reality<span class="item-tag tag-d">daily</span></li>
+          <li class="list-item"><span class="dot" style="background:#d35400"></span>The transformation — body, style, presence<span class="item-tag tag-w">3x/week</span></li>
+          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>The experiences — resort, travel, events<span class="item-tag tag-w">3x/week</span></li>
+          <li class="list-item"><span class="dot" style="background:#27ae60"></span>The mind — EFT insights, books, finance<span class="item-tag tag-w">2x/week</span></li>
+          <li class="list-item"><span class="dot" style="background:#2980b9"></span>The connector — BNI, founders, network<span class="item-tag tag-w">2x/week</span></li>
+        </ul>
+      </div>
+
+      <div class="section-heading">Get ideas now</div>
+      <div class="card">
+        <textarea id="contentInput" placeholder="Tell me what's happening in your life this week — I'll give you 7 Higgsfield-ready Malayalam content ideas..." rows="3"></textarea>
+        <button class="btn-primary" onclick="getContentIdeas()">Get this week's content ideas ↗</button>
+        <button class="btn-secondary" onclick="get30DaySprint()">Give me a 30-day content sprint ↗</button>
+        <div class="chat-wrap" id="contentChat" style="margin-top:8px"></div>
+      </div>
+
+    </div>
+
+    <!-- ATTRACTION SCREEN -->
+    <div class="screen fadein" id="screen-attraction">
+
+      <div class="card">
+        <div class="card-label">Partner pool — 500-day goal</div>
+        <div style="display:flex;align-items:baseline;gap:8px;margin:8px 0 4px">
+          <span style="font-family:'DM Mono',monospace;font-size:36px;font-weight:400;color:var(--text)" id="pCount">0</span>
+          <span style="font-size:13px;color:var(--text3)">of 50</span>
+        </div>
+        <div class="prog-wrap"><div class="prog-fill" id="pBar" style="width:0%;background:var(--orange)"></div></div>
+        <div class="p-grid" id="pDots"></div>
+      </div>
+
+      <div class="section-heading">How the 50 happens — without chasing</div>
+      <div class="card">
+        <ul style="list-style:none">
+          <li class="list-item"><span class="dot" style="background:#d35400"></span>Greek physique — approached, not chasing<span class="item-tag tag-t">foundation</span></li>
+          <li class="list-item"><span class="dot" style="background:#9b59b6"></span>Malayalam fame — known before you walk in<span class="item-tag tag-t">pull</span></li>
+          <li class="list-item"><span class="dot" style="background:#2980b9"></span>Events every 60 days — natural meeting ground<span class="item-tag tag-t">venue</span></li>
+          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>Travel every 45 days — new places, new people<span class="item-tag tag-t">exposure</span></li>
+          <li class="list-item"><span class="dot" style="background:#27ae60"></span>Resort — social atmosphere built into life<span class="item-tag tag-t">lifestyle</span></li>
+        </ul>
+      </div>
+
+      <div class="section-heading">Milestones</div>
+      <div class="card">
+        <ul style="list-style:none">
+          <li class="ms-item"><span class="ms-day">Day 100</span><span class="ms-text">10 in pool — lifestyle beginning to pull</span></li>
+          <li class="ms-item"><span class="ms-day">Day 200</span><span class="ms-text">20+ — influence and physique compounding</span></li>
+          <li class="ms-item"><span class="ms-day">Day 300</span><span class="ms-text">35+ — travel and events accelerating</span></li>
+          <li class="ms-item"><span class="ms-day">Day 500</span><span class="ms-text">50+ — maintained effortlessly</span></li>
+        </ul>
+      </div>
+
+      <div class="section-heading">Relationship clarity</div>
+      <div class="card">
+        <ul style="list-style:none">
+          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>Weekly EFT + journaling — what do I actually feel?</li>
+          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>No pressure to decide — clarity comes from living</li>
+          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>By Day 500 — you will know honestly</li>
+        </ul>
+        <button class="btn-secondary" style="margin-top:12px" onclick="claritySession()">Start a clarity session ↗</button>
+        <div class="chat-wrap" id="attractionChat" style="margin-top:8px"></div>
+      </div>
+
+    </div>
+
+    <!-- MILESTONES SCREEN -->
+    <div class="screen fadein" id="screen-milestones">
+      <div class="card">
+        <div class="card-label">500-day map — real numbers</div>
+        <ul style="list-style:none">
+          <li class="ms-item"><span class="ms-day">Day 30</span><span class="ms-text">First book done. AI proposal sent. Workout streak. Content begun.</span><span class="ms-tag">Month 1</span></li>
+          <li class="ms-item"><span class="ms-day">Day 60</span><span class="ms-text">First event. Resort improved. ₹5L/month. 1K followers. 5 in pool.</span><span class="ms-tag">Month 2</span></li>
+          <li class="ms-item"><span class="ms-day">Day 100</span><span class="ms-text">First AI client. ₹7L/month. 10 in pool. 5K followers. Body shifting.</span><span class="ms-tag">Month 3</span></li>
+          <li class="ms-item"><span class="ms-day">Day 150</span><span class="ms-text">3 books. ₹10L/month. Debt reducing. Resort profitable.</span><span class="ms-tag">Month 5</span></li>
+          <li class="ms-item"><span class="ms-day">Day 200</span><span class="ms-text">₹10L steady. 20 in pool. 10K followers. Second event.</span><span class="ms-tag">Month 7</span></li>
+          <li class="ms-item"><span class="ms-day">Day 250</span><span class="ms-text">5 books. First real trip. 25K followers. Bilingual content.</span><span class="ms-tag">Month 8</span></li>
+          <li class="ms-item"><span class="ms-day">Day 300</span><span class="ms-text">Debt cleared. Physique undeniable. 35 in pool. 50K followers. ₹15L/month.</span><span class="ms-tag">Month 10</span></li>
+          <li class="ms-item"><span class="ms-day">Day 365</span><span class="ms-text">Year 1. All goals compounding. Unrecognisable from Day 1.</span><span class="ms-tag">Year 1</span></li>
+          <li class="ms-item"><span class="ms-day">Day 400</span><span class="ms-text">10 books. Debt free. Investments begin. 200K followers.</span><span class="ms-tag">Month 13</span></li>
+          <li class="ms-item"><span class="ms-day">Day 450</span><span class="ms-text">500K followers. Multiple revenue streams. Life fully documented.</span><span class="ms-tag">Month 15</span></li>
+          <li class="ms-item"><span class="ms-day">Day 500</span><span class="ms-text">₹100Cr path locked. 1M+ followers. Greek physique. 50+ pool. Empire visible.</span><span class="ms-tag">Day 500</span></li>
+        </ul>
+      </div>
+      <button class="btn-secondary" onclick="reviewMilestones()">Review and redirect my milestones ↗</button>
+      <div class="chat-wrap" id="msChat" style="margin-top:8px"></div>
+    </div>
+
+    <!-- WINS SCREEN -->
+    <div class="screen fadein" id="screen-wins">
+      <div class="card">
+        <div class="card-label">Log a win — any size</div>
+        <textarea id="winInput" placeholder="2 pages read. Kaggle done. Revenue call made. Content posted. New connection. Write anything — it all counts..."></textarea>
+        <button class="btn-primary" onclick="logWin()">Log this win ↗</button>
+      </div>
+      <div class="win-card">
+        <div class="win-date">Day 1</div>
+        <div class="win-text">The system exists. Most people have dreams. You built the architecture. Everything compounds from here.</div>
+      </div>
+      <div id="winsList"></div>
+    </div>
+
+    <!-- IDENTITY SCREEN -->
+    <div class="screen fadein" id="screen-identity">
+      <div class="identity-quote">
+        <div class="identity-text">"I am the man people cannot categorise. I build empires quietly, live loudly, attract everything I deserve — and I do it entirely on my own terms. From Kochi. From ₹50L in debt. Watch."</div>
+      </div>
+
+      <div class="section-heading">The blend</div>
+      <div class="card">
+        <ul style="list-style:none">
+          <li class="list-item"><span class="dot" style="background:#27ae60"></span>Warren Buffett — compounding discipline and capital</li>
+          <li class="list-item"><span class="dot" style="background:#2980b9"></span>Richard Branson — adventure, magnetism, lifestyle as brand</li>
+          <li class="list-item"><span class="dot" style="background:#9b59b6"></span>Lee Kuan Yew — precision, nation-building, long game</li>
+          <li class="list-item"><span class="dot" style="background:#d35400"></span>Greek physique + fighter — presence that commands</li>
+          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>Kochi origin — the story nobody saw coming</li>
+        </ul>
+      </div>
+
+      <div class="section-heading">Beliefs being installed</div>
+      <div class="card">
+        <ul style="list-style:none">
+          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>The debt is the beginning, not the end</li>
+          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>Every small action today is future net worth</li>
+          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>My life is the content. My story is the brand.</li>
+          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>I don't need to be understood. I need to be undeniable.</li>
+          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>I attract what I become, not what I want</li>
+        </ul>
+      </div>
+
+      <button class="btn-primary" onclick="generateWarCry()">Generate my morning war cry ↗</button>
+      <div class="chat-wrap" id="identityChat" style="margin-top:8px"></div>
+    </div>
+
+  </div><!-- end content -->
+</div><!-- end app -->
+
+<script>
+// ─── STATE ───────────────────────────────────────────────
+const STORAGE_KEY = 'eby_life_os';
+let state = {
+  startDate: null,
+  checks: {},
+  lastCheckDate: null,
+  partnerCount: 0,
+  partnerDots: [],
+  wins: [],
+  streak: 0,
+  lastStreakDate: null
+};
+
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function load() {
+  const d = localStorage.getItem(STORAGE_KEY);
+  if (d) state = {...state, ...JSON.parse(d)};
+  if (!state.startDate) { state.startDate = new Date().toISOString(); save(); }
+}
+
+// ─── DAY COUNTER ─────────────────────────────────────────
+function getDayNumber() {
+  const start = new Date(state.startDate);
+  const now = new Date();
+  return Math.max(1, Math.floor((now - start) / 86400000) + 1);
+}
+
+function updateDayBadge() {
+  const d = getDayNumber();
+  document.getElementById('dayBadge').textContent = 'Day ' + d + ' of 500';
+  document.getElementById('dayNum').textContent = d;
+}
+
+// ─── CHECKLIST ───────────────────────────────────────────
+function getTodayKey() { return new Date().toISOString().slice(0,10); }
+
+function loadChecks() {
+  const today = getTodayKey();
+  if (state.lastCheckDate !== today) {
+    state.checks = {};
+    state.lastCheckDate = today;
+    save();
+  }
+  document.querySelectorAll('.check-item').forEach(el => {
+    const key = el.getAttribute('onclick').match(/'([^']+)'/)?.[1];
+    if (key && state.checks[key]) el.classList.add('done');
+  });
+  updateScore();
+}
+
+function toggleCheck(el, key) {
+  el.classList.toggle('done');
+  state.checks[key] = el.classList.contains('done');
+  save();
+  updateScore();
+}
+
+function updateScore() {
+  const total = document.querySelectorAll('.check-item').length;
+  const done = document.querySelectorAll('.check-item.done').length;
+  const pct = done / total;
+  const circumference = 163.4;
+  const offset = circumference - (pct * circumference);
+  document.getElementById('scoreRing').style.strokeDashoffset = offset;
+  document.getElementById('scoreRingText').textContent = done + '/' + total;
+  const msgs = ['Start your day. Check off each win.','Good start. Keep going.','Halfway there. You\'re building momentum.','Strong day. Push to the finish.','6 done. One more. Don\'t stop now.','Perfect day. Every non-negotiable hit. This is who you\'re becoming.'];
+  document.getElementById('scoreMsg').textContent = msgs[Math.min(done, msgs.length-1)];
+}
+
+// ─── PARTNER DOTS ─────────────────────────────────────────
+function buildPartnerDots() {
+  const grid = document.getElementById('pDots');
+  grid.innerHTML = '';
+  for (let i = 1; i <= 50; i++) {
+    const d = document.createElement('div');
+    d.className = 'p-dot' + (state.partnerDots.includes(i) ? ' on' : '');
+    d.textContent = i;
+    d.onclick = () => {
+      if (state.partnerDots.includes(i)) {
+        state.partnerDots = state.partnerDots.filter(x => x !== i);
+        d.classList.remove('on');
+      } else {
+        state.partnerDots.push(i);
+        d.classList.add('on');
+      }
+      state.partnerCount = state.partnerDots.length;
+      updatePartnerCount();
+      save();
+    };
+    grid.appendChild(d);
+  }
+  updatePartnerCount();
+}
+
+function updatePartnerCount() {
+  document.getElementById('pCount').textContent = state.partnerCount;
+  document.getElementById('pBar').style.width = Math.round(state.partnerCount / 50 * 100) + '%';
+}
+
+// ─── WINS ─────────────────────────────────────────────────
+function loadWins() {
+  const list = document.getElementById('winsList');
+  list.innerHTML = '';
+  state.wins.slice().reverse().forEach(w => {
+    const c = document.createElement('div');
+    c.className = 'win-card';
+    c.innerHTML = '<div class="win-date">' + w.date + '</div><div class="win-text">' + w.text + '</div>';
+    list.appendChild(c);
+  });
+}
+
+function logWin() {
+  const val = document.getElementById('winInput').value.trim();
+  if (!val) return;
+  const today = new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
+  state.wins.push({ date: today, text: val });
+  save();
+  loadWins();
+  document.getElementById('winInput').value = '';
+  addMsg('winChat', val, 'user');
+  callClaude("Eby just logged this win: '" + val + "' — Celebrate it genuinely in 2 lines. Connect it to one of his 5 goals. Then give him one next action to build momentum.", 'winsList', true);
+}
+
+// ─── SCREEN NAVIGATION ────────────────────────────────────
+function showScreen(name, el) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  el.classList.add('active');
+}
+
+// ─── CHAT / CLAUDE API ───────────────────────────────────
+
+
+function addMsg(containerId, text, role) {
+  const wrap = document.getElementById(containerId);
+  if (!wrap) return;
+  const msg = document.createElement('div');
+  msg.className = 'msg ' + role;
+  msg.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+  wrap.appendChild(msg);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+function addTyping(containerId) {
+  const wrap = document.getElementById(containerId);
+  if (!wrap) return null;
+  const t = document.createElement('div');
+  t.className = 'msg ai typing';
+  t.innerHTML = '<span></span><span></span><span></span>';
+  wrap.appendChild(t);
+  wrap.scrollTop = wrap.scrollHeight;
+  return t;
+}
+
+// BACKEND_URL will be replaced with your Railway URL
+const BACKEND_URL = 'YOUR_RAILWAY_URL_HERE';
+
+async function callClaude(userMsg, chatId, inline) {
+  const typing = addTyping(chatId);
+  try {
+    const res = await fetch(BACKEND_URL + '/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: userMsg })
+    });
+    const data = await res.json();
+    if (typing) typing.remove();
+    const reply = data.reply || data.error || 'Something went wrong. Try again.';
+    addMsg(chatId, reply, 'ai');
+  } catch(e) {
+    if (typing) typing.remove();
+    addMsg(chatId, 'Connection error. Check your internet and try again.', 'ai');
+  }
+}
+
+function sendChat() {
+  const val = document.getElementById('chatInput').value.trim();
+  if (!val) return;
+  addMsg('chatWrap', val, 'user');
+  document.getElementById('chatInput').value = '';
+  const prompt = "Eby's daily check-in: " + val + " — Give exactly: 1) 3 focus actions for today, 2) 1-2 things to drop today, 3) One line of fire to close. Under 150 words.";
+  callClaude(prompt, 'chatWrap', false);
+}
+
+function quickPrompt(type) {
+  const prompts = {
+    weekly: "Eby wants his weekly Life OS review. Ask him: current revenue, follower count, debt progress, non-negotiables this week, biggest win, biggest struggle. Then give honest assessment + top 2 priorities for next week.",
+    correct: "Eby wants a course correction. Something isn't working or has changed. Ask him what shifted — then redesign his focus for the next 30 days to get back on the fastest path.",
+    trip: "Eby wants to plan a trip. Rules: ≤₹15K budget, must feed 2+ goals simultaneously, must produce Higgsfield content. Suggest 2-3 Kerala destinations and exactly what to create there."
+  };
+  addMsg('chatWrap', {weekly:'Weekly review', correct:'Course correction', trip:'Plan a trip'}[type], 'user');
+  callClaude(prompts[type], 'chatWrap', false);
+}
+
+function getContentIdeas() {
+  const val = document.getElementById('contentInput').value.trim();
+  const prompt = "Give Eby 7 Higgsfield-ready Malayalam visual story content ideas" + (val ? " based on his week: " + val : " for this week") + ". Format: Malayalam title + one-line cinematic visual description. All based on his real life: Adivinar business, Club Catalyst resort, transformation journey, mindset. Bold, not generic.";
+  if (val) addMsg('contentChat', val, 'user');
+  callClaude(prompt, 'contentChat', false);
+}
+
+function get30DaySprint() {
+  addMsg('contentChat', '30-day content sprint', 'user');
+  callClaude("Give Eby a specific 30-day Malayalam content sprint plan to grow from 157 to 5,000 followers using Higgsfield visual storytelling. What to post, how often, what hooks work for Malayalam audience on Instagram and YouTube Shorts. Week by week breakdown.", 'contentChat', false);
+}
+
+function claritySession() {
+  addMsg('attractionChat', 'Relationship clarity session', 'user');
+  callClaude("Guide Eby through 5 honest reflection questions about his relationship wiring. He is 34, unmarried, exploring whether polygamy is his long-term truth or whether a committed relationship is what he actually wants beneath the surface. No judgment. No agenda. Just questions that reveal what he actually feels.", 'attractionChat', false);
+}
+
+function reviewMilestones() {
+  addMsg('msChat', 'Review my milestones', 'user');
+  callClaude("Eby wants to review his 500-day milestone map. He started with 157 followers, ₹4L/month, ₹50L debt. Ask him what day he is on and his current numbers — then tell him what's on track, what's behind, and exactly what to do this week.", 'msChat', false);
+}
+
+function generateWarCry() {
+  addMsg('identityChat', 'Generate morning war cry', 'user');
+  callClaude("Write Eby a 60-second morning war cry. Malayalam and English mixed naturally. Starting from ₹50L debt, 157 followers, building to ₹100Cr, Greek god physique, 1M+ influence, 50-person attraction pool. From Kochi. Make it feel like a man who has already decided. Bold, grounded, not self-help.", 'identityChat', false);
+}
+
+// Enter key to send chat
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey && document.activeElement.id === 'chatInput') {
+    e.preventDefault();
+    sendChat();
+  }
+});
+
+// ─── INIT ─────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  load();
+  setTimeout(() => {
+    document.getElementById('loadScreen').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'flex';
+    updateDayBadge();
+    loadChecks();
+    buildPartnerDots();
+    loadWins();
+  }, 1600);
+});
+
+// Service worker registration
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
