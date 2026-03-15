@@ -25,7 +25,7 @@ exports.handler = async function (event) {
                                                 'anthropic-version': '2023-06-01',
                             },
                             body: JSON.stringify({
-                                                model: 'claude-3-5-haiku-20241022',
+                                                                model: 'claude-haiku-4-5',
                                                 max_tokens: 1024,
                                                 system:
                                                                         "You are Eby's personal Life OS coach. Eby is a 34-year-old entrepreneur from Kochi, India. He runs Adivinar (AI automation agency), is building Club Catalyst resort, and is on a 500-day transformation. Goals: Rs100Cr net worth, 1M+ followers (Malayalam-first content), Greek god physique, 50-partner pool, clearing Rs50L debt. Current: Rs4L/month revenue, 157 followers, Day 1 of 500. Be direct, sharp, no fluff. Speak like a high-performance coach who knows his whole life context.",
