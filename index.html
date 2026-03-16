@@ -8,1216 +8,1186 @@
 <meta name="apple-mobile-web-app-title" content="Life OS">
 <meta name="theme-color" content="#0a0a0a">
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">h
-<title>Eby's Life OS</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>Eby Life OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root {
-  --bg: #0a0a0a;
-  --bg2: #111111;
-  --bg3: #1a1a1a;
-  --border: rgba(255,255,255,0.08);
-  --border2: rgba(255,255,255,0.15);
-  --text: #f0ede8;
-  --text2: #888880;
-  --text3: #555550;
-  --gold: #c9a84c;
-  --gold2: #8a6f2e;
-  --red: #c0392b;
-  --green: #27ae60;
-  --blue: #2980b9;
-  --orange: #d35400;
-  --safe-top: env(safe-area-inset-top);
-  --safe-bottom: env(safe-area-inset-bottom);
+/* ââ RESET ââ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:#0a0a0a}
+body{font-family:'DM Sans',sans-serif;color:#e8e8e8;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+button{font-family:'DM Sans',sans-serif;cursor:pointer}
+input,textarea{font-family:'DM Sans',sans-serif}
+
+/* ââ VARIABLES ââ */
+:root{
+  --bg:#0a0a0a;
+  --card:#111111;
+  --elevated:#181818;
+  --border:#1e1e1e;
+  --border2:#272727;
+  --text:#e8e8e8;
+  --t2:#888;
+  --t3:#444;
+  --g1:#4caf7d;
+  --g2:#5b9bd5;
+  --g3:#d4845a;
+  --g4:#9b7fd4;
+  --g5:#c9a84c;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bot:env(safe-area-inset-bottom,0px);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+/* ââ APP SHELL ââ */
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  min-height: 100vh;
-  min-height: 100dvh;
-  overflow-x: hidden;
+/* ââ HEADER ââ */
+#hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:calc(var(--safe-top) + 14px) 20px 12px;
+  background:var(--bg);border-bottom:1px solid var(--border);flex-shrink:0;
 }
+.hdr-left{display:flex;flex-direction:column;gap:1px}
+.hdr-day{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;line-height:1}
+.hdr-sub{font-size:11px;color:var(--t3);letter-spacing:.3px;margin-top:2px}
+.hdr-streak{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--t2)}
+.hdr-streak span:first-child{font-size:17px}
 
-.app {
-  max-width: 480px;
-  margin: 0 auto;
-  min-height: 100vh;
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
+/* ââ GOALS STRIP ââ */
+#gstrip{
+  display:flex;gap:0;padding:0 4px;background:var(--bg);
+  border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;scrollbar-width:none;
 }
-
-/* HEADER */
-.header {
-  padding: calc(var(--safe-top) + 16px) 20px 16px;
-  border-bottom: 0.5px solid var(--border);
-  background: var(--bg);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+#gstrip::-webkit-scrollbar{display:none}
+.gs-item{
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  flex:1;min-width:58px;padding:10px 4px;cursor:pointer;
 }
+.gs-ring{width:38px;height:38px;position:relative;display:flex;align-items:center;justify-content:center}
+.gs-pct{font-size:10px;font-weight:500;position:relative;z-index:1}
+.gs-name{font-size:9px;color:var(--t2);text-align:center;line-height:1.2;letter-spacing:.2px}
 
-.header-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
+/* ââ SCREENS ââ */
+#screens{flex:1;overflow:hidden;position:relative}
+.screen{
+  position:absolute;inset:0;overflow-y:auto;
+  padding:12px 0 calc(var(--safe-bot) + 76px);
+  display:none;scrollbar-width:none;
 }
+.screen::-webkit-scrollbar{display:none}
+.screen.active{display:block}
 
-.logo {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 22px;
-  font-weight: 600;
-  color: var(--text);
-  letter-spacing: -0.3px;
+/* ââ BOTTOM NAV ââ */
+#nav{
+  display:flex;background:var(--bg);border-top:1px solid var(--border);
+  padding-bottom:var(--safe-bot);flex-shrink:0;
 }
-
-.logo span { color: var(--gold); }
-
-.day-badge {
-  font-family: 'DM Mono', monospace;
-  font-size: 11px;
-  color: var(--gold);
-  border: 0.5px solid var(--gold2);
-  padding: 4px 10px;
-  border-radius: 99px;
-  letter-spacing: 0.5px;
+.nb{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  padding:9px 4px 7px;gap:3px;background:none;border:none;
+  color:var(--t3);font-size:9px;font-weight:500;
+  letter-spacing:.6px;text-transform:uppercase;transition:color .2s;
 }
+.nb.on{color:var(--text)}
+.nb-icon{font-size:19px;line-height:1}
 
-/* NAV TABS */
-.nav {
-  display: flex;
-  gap: 0;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.nav::-webkit-scrollbar { display: none; }
-
-.nav-tab {
-  padding: 8px 14px;
-  font-size: 12px;
-  font-weight: 400;
-  color: var(--text3);
-  cursor: pointer;
-  white-space: nowrap;
-  border-bottom: 1.5px solid transparent;
-  transition: all 0.2s;
-  background: none;
-  border-top: none;
-  border-left: none;
-  border-right: none;
-  font-family: 'DM Sans', sans-serif;
+/* ââ SECTION HEADER ââ */
+.sh{
+  padding:14px 20px 7px;font-size:10px;font-weight:500;
+  color:var(--t3);letter-spacing:1.8px;text-transform:uppercase;
 }
 
-.nav-tab.active {
-  color: var(--gold);
-  border-bottom-color: var(--gold);
-  font-weight: 500;
+/* ââ CARD ââ */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin:0 16px 12px}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;margin-bottom:3px}
+.card-sub{font-size:12px;color:var(--t2);margin-bottom:14px}
+
+/* ââ FORM ELEMENTS ââ */
+.inp{
+  width:100%;background:var(--elevated);border:1px solid var(--border);
+  border-radius:10px;padding:11px 13px;color:var(--text);font-size:14px;outline:none;
+  transition:border-color .2s;
+}
+.inp:focus{border-color:var(--border2)}
+.inp::placeholder{color:var(--t3)}
+textarea.inp{resize:none;line-height:1.55}
+.lbl{font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px}
+.frow{margin-bottom:12px}
+
+/* ââ BUTTONS ââ */
+.btn-main{
+  display:block;width:calc(100% - 32px);margin:0 16px 14px;
+  padding:15px;background:var(--text);color:var(--bg);border:none;
+  border-radius:12px;font-size:15px;font-weight:500;text-align:center;
+  transition:all .15s;letter-spacing:.2px;
+}
+.btn-main:disabled{opacity:.35;pointer-events:none}
+.btn-main:active{transform:scale(.98)}
+.btn-sm{
+  padding:9px 16px;background:var(--elevated);border:1px solid var(--border2);
+  border-radius:9px;color:var(--text);font-size:13px;transition:all .15s;
+}
+.btn-sm:active{opacity:.7}
+.btn-accent{
+  padding:9px 18px;border:none;border-radius:9px;
+  font-size:13px;font-weight:500;color:#fff;
 }
 
-/* CONTENT */
-.content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 20px 16px calc(var(--safe-bottom) + 80px);
+/* ââ TODAY: MOOD ââ */
+.iood-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;padding:0 16px;margin-bottom:12px}
+.mood-btn{
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  padding:11px 4px;background:var(--card);border:1.5px solid var(--border);
+  border-radius:12px;font-size:9px;color:var(--t2);text-transform:uppercase;
+  letter-spacing:.5px;transition:all .2s;
+}
+.mood-emoji{font-size:22px}
+.mood-btn.on{border-color:var(--g5);background:#1b1a0f;color:var(--g5)}
+
+/* ââ TODAY: PROGRESS ââ */
+.prog-wrap{padding:10px 16px 6px}
+.prog-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.prog-lbl{font-size:12px;color:var(--t2)}
+.prog-num{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600}
+.prog-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:var(--text);border-radius:2px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+
+/* ââ TODAY: TASKS ââ */
+.task-list{padding:0 16px}
+.task{
+  display:flex;align-items:center;gap:11px;
+  padding:13px 15px;background:var(--card);border:1px solid var(--border);
+  border-radius:12px;margin-bottom:7px;cursor:pointer;transition:all .2s;
+}
+.task.done{opacity:.45}
+.task.done .t-title{text-decoration:line-through;color:var(--t2)}
+.t-check{
+  width:21px;height:21px;border-radius:50%;border:1.5px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  font-size:11px;transition:all .2s;
+}
+.task.done .t-check{background:var(--text);border-color:var(--text);color:var(--bg)}
+.t-body{flex:1;min-width:0}
+.t-title{font-size:14px;line-height:1.3;margin-bottom:3px}
+.t-meta{display:flex;gap:7px;align-items:center}
+.t-cat{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.4px}
+.t-dur{font-size:10px;color:var(--t3)}
+.t-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+
+/* ââ CUSTOM TASK ADD ââ */
+.ct-row{display:flex;gap:8px;padding:0 16px;margin-bottom:12px}
+.ct-row input{flex:1}
+.ct-btn{padding:0 16px;background:var(--elevated);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:22px;line-height:1}
+
+/* ââ RESET DAY ââ */
+.reset-row{
+  padding:0 16px 8px;display:flex;justify-content:flex-end;
+}
+.reset-link{background:none;border:none;font-size:11px;color:var(--t3);text-decoration:underline;padding:4px 0}
+
+/* ââ GOALS SCREEN ââ */
+.goal-card{background:var(--card);border:1px solid var(--border);border-radius:16px;margin:0 16px 10px;overflow:hidden}
+.goal-top{display:flex;align-items:flex-start;gap:11px;padding:15px 17px;cursor:pointer}
+.goal-bar{width:3px;border-radius:2px;align-self:stretch;flex-shrink:0;min-height:36px}
+.goal-info{flex:1}
+.goal-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;line-height:1.2;margin-bottom:2px}
+.goal-tgt{font-size:12px;color:var(--t2);line-height:1.4}
+.goal-pct{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;flex-shrink:0}
+.goal-prog{height:2px;background:var(--border);margin:0 17px 0;overflow:hidden}
+.goal-prog-fill{height:100%;transition:width .4s}
+.goal-edit{padding:14px 17px;border-top:1px solid var(--border);display:none}
+.goal-edit.open{display:block}
+
+/* ââ METRICS ââ */
+.met-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.met-item{background:var(--elevated);border-radius:10px;padding:12px 8px;text-align:center}
+.met-val{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;line-height:1.2;margin-bottom:2px}
+.met-lbl{font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.6px}
+
+/* ââ LEARN SCREEN ââ */
+.lrn-card{background:var(--card);border:1px solid var(--border);border-radius:16px;margin:0 16px 10px;overflow:hidden}
+.lrn-hdr{display:flex;align-items:center;gap:11px;padding:14px 17px;cursor:pointer}
+.lrn-icon{font-size:21px}
+.lrn-hdr-text{flex:1}
+.lrn-title{font-size:15px;font-weight:500;margin-bottom:1px}
+.lrn-sub{font-size:11px;color:var(--t2)}
+.lrn-arrow{font-size:12px;color:var(--t3);transition:transform .2s}
+.lrn-arrow.open{transform:rotate(90deg)}
+.lrn-body{padding:0 17px 16px;border-top:1px solid var(--border);display:none}
+.lrn-body.open{display:block}
+.lrn-content{font-size:13px;line-height:1.75;color:var(--text);padding-top:14px;white-space:pre-wrap}
+.lrn-empty{font-size:12px;color:var(--t3);padding-top:14px;text-align:center}
+.btn-gen{
+  margin-top:13px;width:100%;padding:10px;background:var(--elevated);
+  border:1px solid var(--border2);border-radius:9px;color:var(--text);font-size:13px;text-align:center;
 }
 
-.screen { display: none; }
-.screen.active { display: block; }
+/* ââ COACH SCREEN ââ */
+.warcry{font-family:'Cormorant Garamond',serif;font-size:19px;font-style:italic;line-height:1.6;margin-bottom:14px;min-height:56px;color:var(--text)}
+.aff-list{display:flex;flex-direction:column;gap:9px;margin-bottom:14px}
+.aff-item{display:flex;gap:9px;align-items:flex-start}
+.aff-dot{width:5px;height:5px;border-radius:50%;background:var(--g5);margin-top:7px;flex-shrink:0}
+.aff-text{font-size:13px;line-height:1.6}
 
-/* CARDS */
-.card {
-  background: var(--bg2);
-  border: 0.5px solid var(--border);
-  border-radius: 16px;
-  padding: 16px;
-  margin-bottom: 12px;
+/* ââ CHAT ââ */
+.chat-msgs{
+  max-height:260px;overflow-y:auto;margin-bottom:12px;
+  display:flex;flex-direction:column;gap:9px;scrollbar-width:none;
 }
+.chat-msgs::-webkit-scrollbar{display:none}
+.msg{max-width:86%;padding:10px 13px;border-radius:12px;font-size:13px;line-height:1.6}
+.msg.u{background:var(--elevated);align-self:flex-end}
+.msg.a{background:var(--bg);border:1px solid var(--border);align-self:flex-start}
+.chat-row{display:flex;gap:8px}
+.chat-row input{flex:1}
+.btn-send{padding:10px 15px;background:var(--text);color:var(--bg);border:none;border-radius:10px;font-size:16px;font-weight:500}
 
-.card-label {
-  font-size: 10px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text3);
-  margin-bottom: 6px;
-}
+/* ââ WINS SCREEN ââ */
+.win-input-wrap{padding:0 16px;margin-bottom:12px}
+.win-item{padding:13px 17px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin:0 16px 8px}
+.win-text{font-size:14px;line-height:1.45;margin-bottom:6px}
+.win-footer{display:flex;justify-content:space-between;align-items:center}
+.win-day{font-size:11px;color:var(--t3)}
+.win-goal-tag{font-size:11px;font-weight:500}
 
-.card-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 20px;
-  color: var(--text);
-  margin-bottom: 12px;
-  line-height: 1.3;
-}
+/* ââ LOADING ââ */
+.dots{display:flex;gap:4px;align-items:center;justify-content:center;padding:16px}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--t3);animation:dp 1.2s infinite}
+.dot:nth-child(2){animation-delay:.2s}
+.dot:nth-child(3){animation-delay:.4s}
+@keyframes dp{0%,60%,100%{opacity:.25;transform:scale(.75)}30%{opacity:1;transform:scale(1)}}
+.empty{text-align:center;padding:32px 20px;font-size:13px;color:var(--t3);font-style:italic;line-height:1.6}
 
-/* STATS ROW */
-.stats-row {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  margin-bottom: 12px;
+/* ââ CELEBRATION ââ */
+#cel{
+  position:fixed;inset:0;z-index:900;display:none;
+  align-items:center;justify-content:center;padding:40px;
 }
+#cel.show{display:flex}
+.cel-bg{position:absolute;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(12px)}
+.cel-box{
+  position:relative;z-index:1;background:var(--card);border:1px solid var(--border2);
+  border-radius:24px;padding:36px 28px;text-align:center;max-width:310px;width:100%;
+  animation:su .35s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes su{from{transform:translateY(24px) scale(.95);opacity:0}to{transform:none;opacity:1}}
+.cel-emoji{font-size:52px;margin-bottom:14px}
+.cel-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;margin-bottom:8px}
+.cel-msg{font-size:13px;color:var(--t2);line-height:1.65;margin-bottom:22px}
+.cel-btn{padding:12px 32px;background:var(--text);color:var(--bg);border:none;border-radius:10px;font-size:14px;font-weight:500}
 
-.stat-box {
-  background: var(--bg3);
-  border-radius: 12px;
-  padding: 12px;
+/* ââ TOAST ââ */
+#toast{
+  position:fixed;bottom:calc(var(--safe-bot) + 82px);left:50%;
+  transform:translateX(-50%) translateY(12px);background:var(--text);color:var(--bg);
+  padding:9px 20px;border-radius:20px;font-size:13px;font-weight:500;
+  opacity:0;transition:all .25s;z-index:800;white-space:nowrap;pointer-events:none;
 }
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-.stat-label { font-size: 10px; color: var(--text3); margin-bottom: 4px; }
-.stat-value { font-size: 20px; font-weight: 500; color: var(--text); font-family: 'DM Mono', monospace; }
-.stat-sub { font-size: 10px; color: var(--text3); margin-top: 2px; }
-.stat-sub.up { color: var(--green); }
-.stat-sub.dn { color: var(--red); }
-.stat-sub.gold { color: var(--gold); }
-
-/* PROGRESS BAR */
-.prog-wrap {
-  background: var(--bg3);
-  border-radius: 99px;
-  height: 3px;
-  margin: 8px 0 12px;
-  overflow: hidden;
+/* ââ STREAK MILESTONES ââ */
+.streak-badge{
+  display:inline-flex;align-items:center;gap:4px;padding:3px 8px;
+  border-radius:20px;font-size:10px;font-weight:500;
 }
-.prog-fill {
-  height: 100%;
-  border-radius: 99px;
-  transition: width 0.5s ease;
-}
-
-/* LIST ITEMS */
-.list-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 0;
-  border-bottom: 0.5px solid var(--border);
-  font-size: 13px;
-  color: var(--text2);
-  line-height: 1.4;
-}
-.list-item:last-child { border-bottom: none; }
-
-.dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.item-tag {
-  font-size: 9px;
-  font-weight: 500;
-  padding: 2px 6px;
-  border-radius: 99px;
-  margin-left: auto;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.tag-d { background: rgba(39,174,96,0.15); color: #27ae60; }
-.tag-w { background: rgba(41,128,185,0.15); color: #2980b9; }
-.tag-m { background: rgba(201,168,76,0.15); color: var(--gold); }
-.tag-t { background: rgba(192,57,43,0.15); color: var(--red); }
-
-/* CHECKLIST */
-.check-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 0.5px solid var(--border);
-  cursor: pointer;
-  transition: opacity 0.2s;
-  -webkit-user-select: none;
-  user-select: none;
-}
-.check-item:last-child { border-bottom: none; }
-.check-item:active { opacity: 0.7; }
-
-.check-box {
-  width: 20px; height: 20px;
-  border: 1px solid var(--border2);
-  border-radius: 6px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  transition: all 0.2s;
-}
-
-.check-item.done .check-box {
-  background: var(--green);
-  border-color: var(--green);
-  color: white;
-}
-
-.check-item.done .check-label {
-  text-decoration: line-through;
-  color: var(--text3);
-}
-
-.check-label { font-size: 13px; color: var(--text2); flex: 1; line-height: 1.4; }
-
-/* INPUTS */
-textarea {
-  width: 100%;
-  background: var(--bg3);
-  border: 0.5px solid var(--border);
-  border-radius: 12px;
-  padding: 12px;
-  font-size: 14px;
-  font-family: 'DM Sans', sans-serif;
-  color: var(--text);
-  resize: none;
-  min-height: 100px;
-  margin-bottom: 10px;
-  -webkit-appearance: none;
-}
-textarea:focus { outline: none; border-color: var(--gold2); }
-textarea::placeholder { color: var(--text3); }
-
-/* BUTTONS */
-.btn-primary {
-  width: 100%;
-  padding: 14px;
-  background: var(--gold);
-  color: #0a0a0a;
-  border: none;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 500;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  transition: opacity 0.2s;
-  margin-bottom: 8px;
-}
-.btn-primary:active { opacity: 0.8; }
-
-.btn-secondary {
-  width: 100%;
-  padding: 12px;
-  background: transparent;
-  color: var(--text2);
-  border: 0.5px solid var(--border2);
-  border-radius: 12px;
-  font-size: 13px;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-bottom: 8px;
-}
-.btn-secondary:active { background: var(--bg3); }
-
-.btn-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-/* CHAT INTERFACE */
-.chat-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 12px;
-  max-height: 320px;
-  overflow-y: auto;
-}
-
-.msg {
-  max-width: 85%;
-  padding: 10px 13px;
-  border-radius: 16px;
-  font-size: 13px;
-  line-height: 1.55;
-}
-
-.msg.user {
-  background: var(--gold);
-  color: #0a0a0a;
-  align-self: flex-end;
-  border-bottom-right-radius: 4px;
-}
-
-.msg.ai {
-  background: var(--bg3);
-  color: var(--text2);
-  align-self: flex-start;
-  border-bottom-left-radius: 4px;
-  border: 0.5px solid var(--border);
-}
-
-.msg.ai strong { color: var(--text); font-weight: 500; }
-
-.typing {
-  display: flex;
-  gap: 4px;
-  padding: 12px;
-  align-self: flex-start;
-}
-.typing span {
-  width: 6px; height: 6px;
-  background: var(--text3);
-  border-radius: 50%;
-  animation: bounce 1.2s infinite;
-}
-.typing span:nth-child(2) { animation-delay: 0.2s; }
-.typing span:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes bounce {
-  0%, 60%, 100% { transform: translateY(0); }
-  30% { transform: translateY(-6px); }
-}
-
-/* PARTNER DOTS */
-.p-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin: 10px 0;
-}
-.p-dot {
-  width: 26px; height: 26px;
-  border-radius: 50%;
-  border: 0.5px solid var(--border2);
-  background: var(--bg3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 8px;
-  color: var(--text3);
-  font-family: 'DM Mono', monospace;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.p-dot.on { background: var(--orange); border-color: var(--orange); color: white; }
-
-/* MILESTONE */
-.ms-item {
-  display: flex;
-  gap: 12px;
-  padding: 10px 0;
-  border-bottom: 0.5px solid var(--border);
-  align-items: flex-start;
-}
-.ms-item:last-child { border-bottom: none; }
-.ms-day {
-  font-family: 'DM Mono', monospace;
-  font-size: 11px;
-  color: var(--gold);
-  min-width: 48px;
-  padding-top: 1px;
-}
-.ms-text { font-size: 12px; color: var(--text2); line-height: 1.5; flex: 1; }
-.ms-tag {
-  font-size: 9px;
-  padding: 2px 6px;
-  border-radius: 99px;
-  background: var(--bg3);
-  color: var(--text3);
-  border: 0.5px solid var(--border);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-/* WIN CARD */
-.win-card {
-  background: var(--bg3);
-  border: 0.5px solid var(--border);
-  border-radius: 12px;
-  padding: 12px 14px;
-  margin-bottom: 8px;
-}
-.win-date { font-size: 10px; color: var(--text3); margin-bottom: 3px; font-family: 'DM Mono', monospace; }
-.win-text { font-size: 13px; color: var(--text2); line-height: 1.4; }
-
-/* IDENTITY */
-.identity-quote {
-  border-left: 2px solid var(--gold);
-  padding: 14px 16px;
-  margin-bottom: 12px;
-  background: rgba(201,168,76,0.05);
-  border-radius: 0 12px 12px 0;
-}
-.identity-text {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 17px;
-  font-style: italic;
-  color: var(--text);
-  line-height: 1.6;
-}
-
-/* SCORE RING */
-.score-section {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 14px 0;
-}
-.ring-wrap { position: relative; width: 64px; height: 64px; flex-shrink: 0; }
-.ring-wrap svg { transform: rotate(-90deg); }
-.ring-text {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'DM Mono', monospace;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text);
-}
-.score-info { flex: 1; }
-.score-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
-.score-msg { font-size: 13px; color: var(--text2); line-height: 1.4; }
-
-/* ALERT */
-.alert {
-  padding: 10px 13px;
-  border-radius: 10px;
-  font-size: 12px;
-  line-height: 1.5;
-  margin-bottom: 12px;
-}
-.alert.warn { background: rgba(211,84,0,0.1); border: 0.5px solid rgba(211,84,0,0.3); color: #e67e22; }
-.alert.info { background: rgba(201,168,76,0.08); border: 0.5px solid var(--gold2); color: var(--gold); }
-.alert.good { background: rgba(39,174,96,0.08); border: 0.5px solid rgba(39,174,96,0.3); color: var(--green); }
-
-/* BOTTOM NAV */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 480px;
-  background: rgba(10,10,10,0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-top: 0.5px solid var(--border);
-  display: flex;
-  padding: 8px 0 calc(var(--safe-bottom) + 8px);
-  z-index: 200;
-}
-
-.bnav-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  padding: 6px 4px;
-  cursor: pointer;
-  transition: opacity 0.2s;
-  background: none;
-  border: none;
-  -webkit-user-select: none;
-}
-.bnav-item:active { opacity: 0.6; }
-
-.bnav-icon { font-size: 20px; line-height: 1; }
-.bnav-label { font-size: 9px; color: var(--text3); font-family: 'DM Sans', sans-serif; }
-.bnav-item.active .bnav-icon { filter: none; }
-.bnav-item.active .bnav-label { color: var(--gold); }
-
-/* SECTION HEADING */
-.section-heading {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text3);
-  margin: 20px 0 10px;
-  font-weight: 500;
-}
-.section-heading:first-child { margin-top: 0; }
-
-/* GOAL HEADER */
-.goal-hdr {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 6px;
-}
-.goal-badge {
-  font-size: 10px;
-  font-weight: 500;
-  padding: 3px 8px;
-  border-radius: 99px;
-  margin-left: 8px;
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-
-/* LOADING */
-.loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  gap: 16px;
-}
-.loading-logo {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 36px;
-  font-weight: 600;
-  color: var(--text);
-}
-.loading-logo span { color: var(--gold); }
-.loading-sub { font-size: 13px; color: var(--text3); }
-.loading-bar-wrap {
-  width: 120px;
-  height: 1px;
-  background: var(--border);
-  border-radius: 99px;
-  overflow: hidden;
-}
-.loading-bar {
-  height: 100%;
-  background: var(--gold);
-  border-radius: 99px;
-  animation: loadprog 1.5s ease forwards;
-}
-@keyframes loadprog { from { width: 0; } to { width: 100%; } }
-
-@keyframes fadein {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.fadein { animation: fadein 0.3s ease forwards; }
-
 </style>
 </head>
 <body>
-
-<!-- LOADING SCREEN -->
-<div class="loading" id="loadScreen">
-  <div class="loading-logo">Life <span>OS</span></div>
-  <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
-  <div class="loading-sub">Loading your system...</div>
-</div>
-
-<!-- MAIN APP -->
-<div class="app" id="mainApp" style="display:none">
+<div id="app">
 
   <!-- HEADER -->
-  <div class="header">
-    <div class="header-top">
-      <div class="logo">Life <span>OS</span></div>
-      <div class="day-badge" id="dayBadge">Day 1 of 500</div>
+  <div id="hdr">
+    <div class="hdr-left">
+      <div class="hdr-day" id="hdr-day">Day 1</div>
+      <div class="hdr-sub" id="hdr-sub">499 days left Â· March 2026</div>
     </div>
-    <div class="nav" id="topNav">
-      <button class="nav-tab active" onclick="showScreen('daily',this)">Daily</button>
-      <button class="nav-tab" onclick="showScreen('goals',this)">Goals</button>
-      <button class="nav-tab" onclick="showScreen('numbers',this)">Numbers</button>
-      <button class="nav-tab" onclick="showScreen('content',this)">Content</button>
-      <button class="nav-tab" onclick="showScreen('attraction',this)">Attraction</button>
-      <button class="nav-tab" onclick="showScreen('milestones',this)">Milestones</button>
-      <button class="nav-tab" onclick="showScreen('wins',this)">Wins</button>
-      <button class="nav-tab" onclick="showScreen('identity',this)">Identity</button>
+    <div class="hdr-streak">
+      <span>ð¥</span>
+      <span id="hdr-streak-txt">0 day streak</span>
     </div>
   </div>
 
-  <!-- CONTENT AREA -->
-  <div class="content">
+  <!-- GOALS STRIP -->
+  <div id="gstrip"></div>
 
-    <!-- DAILY SCREEN -->
-    <div class="screen active fadein" id="screen-daily">
+  <!-- SCREENS -->
+  <div id="screens">
 
-      <div class="score-section">
-        <div class="ring-wrap">
-          <svg width="64" height="64" viewBox="0 0 64 64">
-            <circle cx="32" cy="32" r="26" fill="none" stroke="#1a1a1a" stroke-width="5"/>
-            <circle cx="32" cy="32" r="26" fill="none" stroke="#c9a84c" stroke-width="5"
-              stroke-dasharray="163.4" stroke-dashoffset="163.4"
-              stroke-linecap="round" id="scoreRing" style="transition:stroke-dashoffset 0.5s ease"/>
-          </svg>
-          <div class="ring-text" id="scoreRingText">0/7</div>
+    <!-- ââ TODAY ââ -->
+    <div id="screen-today" class="screen active">
+
+      <!-- Setup view (mood selector) -->
+      <div id="today-setup">
+        <div class="sh">Today's energy</div>
+        <div class="mood-grid">
+          <button class="mood-btn" data-mood="fired_up" onclick="pickMood(this)">
+            <span class="mood-emoji">ð¥</span>Fired Up
+          </button>
+          <button class="mood-btn" data-mood="focused" onclick="pickMood(this)">
+            <span class="mood-emoji">ðª</span>Focused
+          </button>
+          <button class="mood-btn" data-mood="steady" onclick="pickMood(this)">
+            <span class="mood-emoji">ð</span>Steady
+          </button>
+          <button class="mood-btn" data-mood="tired" onclick="pickMood(this)">
+            <span class="mood-emoji">ð´</span>Tired
+          </button>
+          <button class="mood-btn" data-mood="rough" onclick="pickMood(this)">
+            <span class="mood-emoji">ð</span>Rough
+          </button>
         </div>
-        <div class="score-info">
-          <div class="score-label">Today's non-negotiables</div>
-          <div class="score-msg" id="scoreMsg">Start your day. Check off each win.</div>
+        <div class="card" style="margin-bottom:12px">
+          <div class="lbl" style="margin-bottom:8px">Anything specific today? <span style="color:var(--t3)">(optional)</span></div>
+          <textarea class="inp" id="sit-input" rows="2" placeholder="e.g. busy afternoon, gym in morning, important meeting..."></textarea>
         </div>
+        <button class="btn-main" id="build-btn" onclick="buildDay()" disabled>Build My Day</button>
       </div>
 
-      <div class="card">
-        <div class="card-label">7 Non-Negotiables</div>
-        <div id="checklist">
-          <div class="check-item" onclick="toggleCheck(this,'eft')">
-            <div class="check-box">✓</div>
-            <div class="check-label">Guided visualisation + EFT (15 min)</div>
+      <!-- Task view (after generation) -->
+      <div id="today-tasks" style="display:none">
+        <div class="prog-wrap">
+          <div class="prog-top">
+            <span class="prog-lbl" id="prog-lbl">0 of 0 done</span>
+            <span class="prog-num" id="prog-num">0%</span>
           </div>
-          <div class="check-item" onclick="toggleCheck(this,'gratitude')">
-            <div class="check-box">✓</div>
-            <div class="check-label">Gratitude + affirmations (5 min)</div>
+          <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+        </div>
+        <div class="reset-row">
+          <button class="reset-link" onclick="resetDay()">âº new day setup</button>
+        </div>
+        <div id="task-list" class="task-list"></div>
+        <div class="ct-row">
+          <input type="text" class="inp" id="ct-input" placeholder="Add a task for today...">
+          <button class="ct-btn" onclick="addCustomTask()">+</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ââ GOALS ââ -->
+    <div id="screen-goals" class="screen">
+      <div class="sh">Your 5 Goals</div>
+      <div id="goals-list"></div>
+
+      <div class="sh" style="margin-top:6px">Live Numbers</div>
+      <div class="card">
+        <div class="met-grid" id="met-display"></div>
+        <div class="frow">
+          <div class="lbl">Revenue / month (â¹)</div>
+          <input type="number" class="inp" id="m-rev" placeholder="e.g. 400000">
+        </div>
+        <div class="frow">
+          <div class="lbl">Followers</div>
+          <input type="number" class="inp" id="m-fol" placeholder="e.g. 157">
+        </div>
+        <div class="frow">
+          <div class="lbl">Debt remaining (â¹)</div>
+          <input type="number" class="inp" id="m-debt" placeholder="e.g. 5000000">
+        </div>
+        <button class="btn-sm" onclick="saveMetrics()" style="width:100%;text-align:center;padding:11px">Save Numbers</button>
+      </div>
+    </div>
+
+    <!-- ââ LEARN ââ -->
+    <div id="screen-learn" class="screen">
+      <div class="sh">Daily Lessons</div>
+
+      <div class="lrn-card">
+        <div class="lrn-hdr" onclick="toggleLearn('en')">
+          <span class="lrn-icon">ð£ï¸</span>
+          <div class="lrn-hdr-text">
+            <div class="lrn-title">English Training</div>
+            <div class="lrn-sub">Word, phrase, or grammar tip</div>
           </div>
-          <div class="check-item" onclick="toggleCheck(this,'read')">
-            <div class="check-box">✓</div>
-            <div class="check-label">Read minimum 5 pages</div>
+          <span class="lrn-arrow" id="la-en">â¶</span>
+        </div>
+        <div class="lrn-body" id="lb-en">
+          <div class="lrn-empty" id="lp-en">Tap to generate today's English lesson</div>
+          <div class="lrn-content" id="lc-en" style="display:none"></div>
+          <button class="btn-gen" onclick="genLesson('en',this)">Generate Lesson</button>
+        </div>
+      </div>
+
+      <div class="lrn-card">
+        <div class="lrn-hdr" onclick="toggleLearn('etq')">
+          <span class="lrn-icon">ð©</span>
+          <div class="lrn-hdr-text">
+            <div class="lrn-title">Etiquette + World</div>
+            <div class="lrn-sub">Sophistication & global intelligence</div>
           </div>
-          <div class="check-item" onclick="toggleCheck(this,'workout')">
-            <div class="check-box">✓</div>
-            <div class="check-label">Workout + Kaggle exercises</div>
+          <span class="lrn-arrow" id="la-etq">â¶</span>
+        </div>
+        <div class="lrn-body" id="lb-etq">
+          <div class="lrn-empty" id="lp-etq">Tap to generate today's etiquette tip</div>
+          <div class="lrn-content" id="lc-etq" style="display:none"></div>
+          <button class="btn-gen" onclick="genLesson('etq',this)">Generate Lesson</button>
+        </div>
+      </div>
+
+      <div class="lrn-card">
+        <div class="lrn-hdr" onclick="toggleLearn('fin')">
+          <span class="lrn-icon">ð</span>
+          <div class="lrn-hdr-text">
+            <div class="lrn-title">Finance 1%</div>
+            <div class="lrn-sub">One wealth concept daily</div>
           </div>
-          <div class="check-item" onclick="toggleCheck(this,'revenue')">
-            <div class="check-box">✓</div>
-            <div class="check-label">1 direct revenue action</div>
+          <span class="lrn-arrow" id="la-fin">â¶</span>
+        </div>
+        <div class="lrn-body" id="lb-fin">
+          <div class="lrn-empty" id="lp-fin">Tap to generate today's finance concept</div>
+          <div class="lrn-content" id="lc-fin" style="display:none"></div>
+          <button class="btn-gen" onclick="genLesson('fin',this)">Generate Lesson</button>
+        </div>
+      </div>
+
+      <div class="lrn-card">
+        <div class="lrn-hdr" onclick="toggleLearn('sty')">
+          <span class="lrn-icon">ð</span>
+          <div class="lrn-hdr-text">
+            <div class="lrn-title">Style + Fashion</div>
+            <div class="lrn-sub">Presence & attraction upgrade</div>
           </div>
-          <div class="check-item" onclick="toggleCheck(this,'content')">
-            <div class="check-box">✓</div>
-            <div class="check-label">Create or publish 1 Malayalam visual story</div>
-          </div>
-          <div class="check-item" onclick="toggleCheck(this,'connect')">
-            <div class="check-box">✓</div>
-            <div class="check-label">Connect with 1 person intentionally</div>
-          </div>
+          <span class="lrn-arrow" id="la-sty">â¶</span>
+        </div>
+        <div class="lrn-body" id="lb-sty">
+          <div class="lrn-empty" id="lp-sty">Tap to generate today's style tip</div>
+          <div class="lrn-content" id="lc-sty" style="display:none"></div>
+          <button class="btn-gen" onclick="genLesson('sty',this)">Generate Lesson</button>
         </div>
       </div>
+    </div>
 
+    <!-- ââ COACH ââ -->
+    <div id="screen-coach" class="screen">
+
+      <div class="sh">Morning War Cry</div>
       <div class="card">
-        <div class="card-label">Daily Coach — Tell me your day</div>
-        <div class="chat-wrap" id="chatWrap"></div>
-        <textarea id="chatInput" placeholder="How is today looking? Energy, schedule, wins, struggles — tell me anything..." rows="3"></textarea>
-        <button class="btn-primary" onclick="sendChat()">Get today's focus ↗</button>
-        <div class="btn-row">
-          <button class="btn-secondary" onclick="quickPrompt('weekly')">Weekly review</button>
-          <button class="btn-secondary" onclick="quickPrompt('correct')">Course correct</button>
+        <div class="warcry" id="warcry-txt">Your battle cry for today. Tap generate.</div>
+        <button class="btn-gen" id="warcry-btn" onclick="genWarCry()">â¡ Generate War Cry</button>
+      </div>
+
+      <div class="sh">Identity Affirmations</div>
+      <div class="card">
+        <div class="aff-list" id="aff-list">
+          <div class="empty" style="padding:8px 0">Generate your affirmations for today</div>
         </div>
-        <button class="btn-secondary" onclick="quickPrompt('trip')">Plan a trip within my goals ↗</button>
+        <button class="btn-gen" id="aff-btn" onclick="genAffirmations()">Generate Affirmations</button>
+      </div>
+
+      <div class="sh">Coach Conversation</div>
+      <div class="card">
+        <div class="chat-msgs" id="chat-msgs">
+          <div class="msg a">Ready. Tell me what's on your mind â or where you need direction today.</div>
+        </div>
+        <div class="chat-row">
+          <input type="text" class="inp" id="chat-inp" placeholder="Ask your coach..." onkeydown="if(event.key==='Enter')sendMsg()">
+          <button class="btn-send" onclick="sendMsg()">â</button>
+        </div>
       </div>
 
     </div>
 
-    <!-- GOALS SCREEN -->
-    <div class="screen fadein" id="screen-goals">
-
-      <div class="alert warn">Real starting line: ₹50L debt. Phase A = clear debt. Phase B = build ₹100Cr. Everything else runs in parallel.</div>
-
-      <div class="card">
-        <div class="goal-hdr">
-          <div><div class="card-label">Goal 1 — Wealth</div><div class="card-title">₹100 Crore net worth</div></div>
-          <span class="goal-badge" style="background:rgba(39,174,96,0.12);color:#27ae60">₹100Cr</span>
-        </div>
-        <div class="prog-wrap"><div class="prog-fill" style="width:1%;background:#27ae60"></div></div>
-        <ul style="list-style:none">
-          <li class="list-item"><span class="dot" style="background:#27ae60"></span>Scale Adivinar: ₹4L → ₹15L/month<span class="item-tag tag-d">daily</span></li>
-          <li class="list-item"><span class="dot" style="background:#27ae60"></span>First AI automation client — 100 days<span class="item-tag tag-t">urgent</span></li>
-          <li class="list-item"><span class="dot" style="background:#27ae60"></span>Club Catalyst resort — profitable 200 days<span class="item-tag tag-w">weekly</span></li>
-          <li class="list-item"><span class="dot" style="background:#27ae60"></span>Finance 1% — one concept daily<span class="item-tag tag-d">daily</span></li>
-          <li class="list-item"><span class="dot" style="background:#27ae60"></span>Startup investing — after debt cleared<span class="item-tag tag-m">phase B</span></li>
-        </ul>
+    <!-- ââ WINS ââ -->
+    <div id="screen-wins" class="screen">
+      <div class="sh">Log a Win</div>
+      <div class="win-input-wrap">
+        <textarea class="inp" id="win-inp" rows="3" placeholder="What did you do today? Any effort counts â visiting the gym counts, 2 pages counts..."></textarea>
       </div>
+      <button class="btn-main" id="log-btn" onclick="logWin()">Log This Win â­</button>
 
-      <div class="card">
-        <div class="goal-hdr">
-          <div><div class="card-label">Goal 2 — Empire</div><div class="card-title">Master connector + ecosystem builder</div></div>
-          <span class="goal-badge" style="background:rgba(41,128,185,0.12);color:#2980b9">Builder</span>
-        </div>
-        <div class="prog-wrap"><div class="prog-fill" style="width:1%;background:#2980b9"></div></div>
-        <ul style="list-style:none">
-          <li class="list-item"><span class="dot" style="background:#2980b9"></span>BNI Warriors — connect and complete<span class="item-tag tag-d">daily</span></li>
-          <li class="list-item"><span class="dot" style="background:#2980b9"></span>Adivinar internal automation<span class="item-tag tag-d">daily</span></li>
-          <li class="list-item"><span class="dot" style="background:#2980b9"></span>Club Catalyst — 10 resort actions<span class="item-tag tag-d">daily</span></li>
-          <li class="list-item"><span class="dot" style="background:#2980b9"></span>1 event every 60 days<span class="item-tag tag-m">monthly</span></li>
-          <li class="list-item"><span class="dot" style="background:#2980b9"></span>2 new founders/investors weekly<span class="item-tag tag-w">weekly</span></li>
-        </ul>
+      <div class="sh">Win History</div>
+      <div id="wins-list">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
       </div>
-
-      <div class="card">
-        <div class="goal-hdr">
-          <div><div class="card-label">Goal 3 — Body & Attraction</div><div class="card-title">Greek god physique · 50-partner pool</div></div>
-          <span class="goal-badge" style="background:rgba(211,84,0,0.12);color:#d35400">Transform</span>
-        </div>
-        <div class="prog-wrap"><div class="prog-fill" style="width:1%;background:#d35400"></div></div>
-        <ul style="list-style:none">
-          <li class="list-item"><span class="dot" style="background:#d35400"></span>Daily workout — physique building<span class="item-tag tag-d">daily</span></li>
-          <li class="list-item"><span class="dot" style="background:#d35400"></span>Kaggle — sexual performance<span class="item-tag tag-d">daily</span></li>
-          <li class="list-item"><span class="dot" style="background:#d35400"></span>Skin care + face exercises<span class="item-tag tag-d">daily</span></li>
-          <li class="list-item"><span class="dot" style="background:#d35400"></span>Fight training — recreational<span class="item-tag tag-w">weekly</span></li>
-          <li class="list-item"><span class="dot" style="background:#d35400"></span>Style upgrade<span class="item-tag tag-m">monthly</span></li>
-          <li class="list-item"><span class="dot" style="background:#d35400"></span>Partner pool — lifestyle-led naturally<span class="item-tag tag-t">500-day</span></li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <div class="goal-hdr">
-          <div><div class="card-label">Goal 4 — Influence</div><div class="card-title">1M+ followers · Malayalam first</div></div>
-          <span class="goal-badge" style="background:rgba(142,68,173,0.12);color:#9b59b6">1M+</span>
-        </div>
-        <div class="prog-wrap"><div class="prog-fill" style="width:0%;background:#9b59b6"></div></div>
-        <ul style="list-style:none">
-          <li class="list-item"><span class="dot" style="background:#9b59b6"></span>Malayalam visual content — Higgsfield<span class="item-tag tag-d">daily</span></li>
-          <li class="list-item"><span class="dot" style="background:#9b59b6"></span>English training — 15 min<span class="item-tag tag-d">daily</span></li>
-          <li class="list-item"><span class="dot" style="background:#9b59b6"></span>Bilingual at Day 180<span class="item-tag tag-m">phase 2</span></li>
-          <li class="list-item"><span class="dot" style="background:#9b59b6"></span>English-led at Day 300<span class="item-tag tag-m">phase 3</span></li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <div class="goal-hdr">
-          <div><div class="card-label">Goal 5 — Life & Clarity</div><div class="card-title">The life people watch in awe</div></div>
-          <span class="goal-badge" style="background:rgba(201,168,76,0.12);color:var(--gold)">Live Big</span>
-        </div>
-        <div class="prog-wrap"><div class="prog-fill" style="width:1%;background:var(--gold)"></div></div>
-        <ul style="list-style:none">
-          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>EFT + visualisation daily<span class="item-tag tag-d">daily</span></li>
-          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>Read 5 pages minimum<span class="item-tag tag-d">daily</span></li>
-          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>Travel — 1 place every 45 days<span class="item-tag tag-m">monthly</span></li>
-          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>Relationship clarity — EFT journaling<span class="item-tag tag-w">weekly</span></li>
-        </ul>
-      </div>
-
     </div>
 
-    <!-- NUMBERS SCREEN -->
-    <div class="screen fadein" id="screen-numbers">
+  </div><!-- /screens -->
 
-      <div class="section-heading">Starting point</div>
-      <div class="stats-row">
-        <div class="stat-box"><div class="stat-label">Followers</div><div class="stat-value">157</div><div class="stat-sub dn">→ 1M target</div></div>
-        <div class="stat-box"><div class="stat-label">Revenue/month</div><div class="stat-value">₹4L</div><div class="stat-sub dn">→ ₹15L target</div></div>
-        <div class="stat-box"><div class="stat-label">Net worth</div><div class="stat-value">-₹50L</div><div class="stat-sub dn">debt to clear</div></div>
-        <div class="stat-box"><div class="stat-label">Day</div><div class="stat-value" id="dayNum">1</div><div class="stat-sub gold">of 500</div></div>
-      </div>
+  <!-- BOTTOM NAV -->
+  <nav id="nav">
+    <button class="nb on" onclick="goTo('today',this)"><span class="nb-icon">âï¸</span>Today</button>
+    <button class="nb" onclick="goTo('goals',this)"><span class="nb-icon">ð¯</span>Goals</button>
+    <button class="nb" onclick="goTo('learn',this)"><span class="nb-icon">ð</span>Learn</button>
+    <button class="nb" onclick="goTo('coach',this)"><span class="nb-icon">ð§ </span>Coach</button>
+    <button class="nb" onclick="goTo('wins',this)"><span class="nb-icon">â­</span>Wins</button>
+  </nav>
 
-      <div class="section-heading">Revenue ladder</div>
-      <div class="card">
-        <ul style="list-style:none">
-          <li class="ms-item"><span class="ms-day">Day 100</span><span class="ms-text">₹4L → ₹7L/month — first AI client + upsells</span></li>
-          <li class="ms-item"><span class="ms-day">Day 200</span><span class="ms-text">₹7L → ₹10L/month — resort + second AI client</span></li>
-          <li class="ms-item"><span class="ms-day">Day 300</span><span class="ms-text">₹10L → ₹15L/month — retainers + SaaS + influence</span></li>
-          <li class="ms-item"><span class="ms-day">Day 500</span><span class="ms-text">₹15L+ compounding — investments, events, brand deals</span></li>
-        </ul>
-      </div>
+</div><!-- /app -->
 
-      <div class="section-heading">Debt clearance rule</div>
-      <div class="card">
-        <div class="alert warn" style="margin-bottom:0">Every ₹1L above ₹4L — 60% goes to debt until cleared. Target: debt-free by Day 300.</div>
-      </div>
+<!-- CELEBRATION OVERLAY -->
+<div id="cel">
+  <div class="cel-bg" onclick="closeCel()"></div>
+  <div class="cel-box">
+    <div class="cel-emoji" id="cel-emoji">ð</div>
+    <div class="cel-title" id="cel-title">Win!</div>
+    <div class="cel-msg" id="cel-msg"></div>
+    <button class="cel-btn" onclick="closeCel()">Keep Going â</button>
+  </div>
+</div>
 
-      <div class="section-heading">Follower growth</div>
-      <div class="card">
-        <ul style="list-style:none">
-          <li class="ms-item"><span class="ms-day">Day 60</span><span class="ms-text">1K followers</span><span class="ms-tag">Malayalam</span></li>
-          <li class="ms-item"><span class="ms-day">Day 100</span><span class="ms-text">5K followers</span><span class="ms-tag">Malayalam</span></li>
-          <li class="ms-item"><span class="ms-day">Day 200</span><span class="ms-text">10K followers</span><span class="ms-tag">Bilingual</span></li>
-          <li class="ms-item"><span class="ms-day">Day 300</span><span class="ms-text">50K followers</span><span class="ms-tag">English</span></li>
-          <li class="ms-item"><span class="ms-day">Day 450</span><span class="ms-text">500K followers</span><span class="ms-tag">National</span></li>
-          <li class="ms-item"><span class="ms-day">Day 500</span><span class="ms-text">1M+ followers</span><span class="ms-tag">Global</span></li>
-        </ul>
-      </div>
-
-    </div>
-
-    <!-- CONTENT SCREEN -->
-    <div class="screen fadein" id="screen-content">
-
-      <div class="alert info">Malayalam first. Higgsfield is your moat. Most people talk — you show. That's the edge.</div>
-
-      <div class="section-heading">3-phase strategy</div>
-      <div class="card">
-        <ul style="list-style:none">
-          <li class="ms-item"><span class="ms-day">0-180</span><span class="ms-text">Malayalam only — visual stories via Higgsfield. Dominate local market.</span><span class="ms-tag">Now</span></li>
-          <li class="ms-item"><span class="ms-day">180-300</span><span class="ms-text">Bilingual — same content, English subtitles added. Start English voiceover.</span><span class="ms-tag">Phase 2</span></li>
-          <li class="ms-item"><span class="ms-day">300+</span><span class="ms-text">English-led. Malayalam audience already loyal. National reach begins.</span><span class="ms-tag">Phase 3</span></li>
-        </ul>
-      </div>
-
-      <div class="section-heading">Content pillars</div>
-      <div class="card">
-        <ul style="list-style:none">
-          <li class="list-item"><span class="dot" style="background:#9b59b6"></span>The builder — Adivinar, AI, business reality<span class="item-tag tag-d">daily</span></li>
-          <li class="list-item"><span class="dot" style="background:#d35400"></span>The transformation — body, style, presence<span class="item-tag tag-w">3x/week</span></li>
-          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>The experiences — resort, travel, events<span class="item-tag tag-w">3x/week</span></li>
-          <li class="list-item"><span class="dot" style="background:#27ae60"></span>The mind — EFT insights, books, finance<span class="item-tag tag-w">2x/week</span></li>
-          <li class="list-item"><span class="dot" style="background:#2980b9"></span>The connector — BNI, founders, network<span class="item-tag tag-w">2x/week</span></li>
-        </ul>
-      </div>
-
-      <div class="section-heading">Get ideas now</div>
-      <div class="card">
-        <textarea id="contentInput" placeholder="Tell me what's happening in your life this week — I'll give you 7 Higgsfield-ready Malayalam content ideas..." rows="3"></textarea>
-        <button class="btn-primary" onclick="getContentIdeas()">Get this week's content ideas ↗</button>
-        <button class="btn-secondary" onclick="get30DaySprint()">Give me a 30-day content sprint ↗</button>
-        <div class="chat-wrap" id="contentChat" style="margin-top:8px"></div>
-      </div>
-
-    </div>
-
-    <!-- ATTRACTION SCREEN -->
-    <div class="screen fadein" id="screen-attraction">
-
-      <div class="card">
-        <div class="card-label">Partner pool — 500-day goal</div>
-        <div style="display:flex;align-items:baseline;gap:8px;margin:8px 0 4px">
-          <span style="font-family:'DM Mono',monospace;font-size:36px;font-weight:400;color:var(--text)" id="pCount">0</span>
-          <span style="font-size:13px;color:var(--text3)">of 50</span>
-        </div>
-        <div class="prog-wrap"><div class="prog-fill" id="pBar" style="width:0%;background:var(--orange)"></div></div>
-        <div class="p-grid" id="pDots"></div>
-      </div>
-
-      <div class="section-heading">How the 50 happens — without chasing</div>
-      <div class="card">
-        <ul style="list-style:none">
-          <li class="list-item"><span class="dot" style="background:#d35400"></span>Greek physique — approached, not chasing<span class="item-tag tag-t">foundation</span></li>
-          <li class="list-item"><span class="dot" style="background:#9b59b6"></span>Malayalam fame — known before you walk in<span class="item-tag tag-t">pull</span></li>
-          <li class="list-item"><span class="dot" style="background:#2980b9"></span>Events every 60 days — natural meeting ground<span class="item-tag tag-t">venue</span></li>
-          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>Travel every 45 days — new places, new people<span class="item-tag tag-t">exposure</span></li>
-          <li class="list-item"><span class="dot" style="background:#27ae60"></span>Resort — social atmosphere built into life<span class="item-tag tag-t">lifestyle</span></li>
-        </ul>
-      </div>
-
-      <div class="section-heading">Milestones</div>
-      <div class="card">
-        <ul style="list-style:none">
-          <li class="ms-item"><span class="ms-day">Day 100</span><span class="ms-text">10 in pool — lifestyle beginning to pull</span></li>
-          <li class="ms-item"><span class="ms-day">Day 200</span><span class="ms-text">20+ — influence and physique compounding</span></li>
-          <li class="ms-item"><span class="ms-day">Day 300</span><span class="ms-text">35+ — travel and events accelerating</span></li>
-          <li class="ms-item"><span class="ms-day">Day 500</span><span class="ms-text">50+ — maintained effortlessly</span></li>
-        </ul>
-      </div>
-
-      <div class="section-heading">Relationship clarity</div>
-      <div class="card">
-        <ul style="list-style:none">
-          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>Weekly EFT + journaling — what do I actually feel?</li>
-          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>No pressure to decide — clarity comes from living</li>
-          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>By Day 500 — you will know honestly</li>
-        </ul>
-        <button class="btn-secondary" style="margin-top:12px" onclick="claritySession()">Start a clarity session ↗</button>
-        <div class="chat-wrap" id="attractionChat" style="margin-top:8px"></div>
-      </div>
-
-    </div>
-
-    <!-- MILESTONES SCREEN -->
-    <div class="screen fadein" id="screen-milestones">
-      <div class="card">
-        <div class="card-label">500-day map — real numbers</div>
-        <ul style="list-style:none">
-          <li class="ms-item"><span class="ms-day">Day 30</span><span class="ms-text">First book done. AI proposal sent. Workout streak. Content begun.</span><span class="ms-tag">Month 1</span></li>
-          <li class="ms-item"><span class="ms-day">Day 60</span><span class="ms-text">First event. Resort improved. ₹5L/month. 1K followers. 5 in pool.</span><span class="ms-tag">Month 2</span></li>
-          <li class="ms-item"><span class="ms-day">Day 100</span><span class="ms-text">First AI client. ₹7L/month. 10 in pool. 5K followers. Body shifting.</span><span class="ms-tag">Month 3</span></li>
-          <li class="ms-item"><span class="ms-day">Day 150</span><span class="ms-text">3 books. ₹10L/month. Debt reducing. Resort profitable.</span><span class="ms-tag">Month 5</span></li>
-          <li class="ms-item"><span class="ms-day">Day 200</span><span class="ms-text">₹10L steady. 20 in pool. 10K followers. Second event.</span><span class="ms-tag">Month 7</span></li>
-          <li class="ms-item"><span class="ms-day">Day 250</span><span class="ms-text">5 books. First real trip. 25K followers. Bilingual content.</span><span class="ms-tag">Month 8</span></li>
-          <li class="ms-item"><span class="ms-day">Day 300</span><span class="ms-text">Debt cleared. Physique undeniable. 35 in pool. 50K followers. ₹15L/month.</span><span class="ms-tag">Month 10</span></li>
-          <li class="ms-item"><span class="ms-day">Day 365</span><span class="ms-text">Year 1. All goals compounding. Unrecognisable from Day 1.</span><span class="ms-tag">Year 1</span></li>
-          <li class="ms-item"><span class="ms-day">Day 400</span><span class="ms-text">10 books. Debt free. Investments begin. 200K followers.</span><span class="ms-tag">Month 13</span></li>
-          <li class="ms-item"><span class="ms-day">Day 450</span><span class="ms-text">500K followers. Multiple revenue streams. Life fully documented.</span><span class="ms-tag">Month 15</span></li>
-          <li class="ms-item"><span class="ms-day">Day 500</span><span class="ms-text">₹100Cr path locked. 1M+ followers. Greek physique. 50+ pool. Empire visible.</span><span class="ms-tag">Day 500</span></li>
-        </ul>
-      </div>
-      <button class="btn-secondary" onclick="reviewMilestones()">Review and redirect my milestones ↗</button>
-      <div class="chat-wrap" id="msChat" style="margin-top:8px"></div>
-    </div>
-
-    <!-- WINS SCREEN -->
-    <div class="screen fadein" id="screen-wins">
-      <div class="card">
-        <div class="card-label">Log a win — any size</div>
-        <textarea id="winInput" placeholder="2 pages read. Kaggle done. Revenue call made. Content posted. New connection. Write anything — it all counts..."></textarea>
-        <button class="btn-primary" onclick="logWin()">Log this win ↗</button>
-      </div>
-      <div class="win-card">
-        <div class="win-date">Day 1</div>
-        <div class="win-text">The system exists. Most people have dreams. You built the architecture. Everything compounds from here.</div>
-      </div>
-      <div id="winsList"></div>
-    </div>
-
-    <!-- IDENTITY SCREEN -->
-    <div class="screen fadein" id="screen-identity">
-      <div class="identity-quote">
-        <div class="identity-text">"I am the man people cannot categorise. I build empires quietly, live loudly, attract everything I deserve — and I do it entirely on my own terms. From Kochi. From ₹50L in debt. Watch."</div>
-      </div>
-
-      <div class="section-heading">The blend</div>
-      <div class="card">
-        <ul style="list-style:none">
-          <li class="list-item"><span class="dot" style="background:#27ae60"></span>Warren Buffett — compounding discipline and capital</li>
-          <li class="list-item"><span class="dot" style="background:#2980b9"></span>Richard Branson — adventure, magnetism, lifestyle as brand</li>
-          <li class="list-item"><span class="dot" style="background:#9b59b6"></span>Lee Kuan Yew — precision, nation-building, long game</li>
-          <li class="list-item"><span class="dot" style="background:#d35400"></span>Greek physique + fighter — presence that commands</li>
-          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>Kochi origin — the story nobody saw coming</li>
-        </ul>
-      </div>
-
-      <div class="section-heading">Beliefs being installed</div>
-      <div class="card">
-        <ul style="list-style:none">
-          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>The debt is the beginning, not the end</li>
-          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>Every small action today is future net worth</li>
-          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>My life is the content. My story is the brand.</li>
-          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>I don't need to be understood. I need to be undeniable.</li>
-          <li class="list-item"><span class="dot" style="background:var(--gold)"></span>I attract what I become, not what I want</li>
-        </ul>
-      </div>
-
-      <button class="btn-primary" onclick="generateWarCry()">Generate my morning war cry ↗</button>
-      <div class="chat-wrap" id="identityChat" style="margin-top:8px"></div>
-    </div>
-
-  </div><!-- end content -->
-</div><!-- end app -->
+<div id="toast"></div>
 
 <script>
-// ─── STATE ───────────────────────────────────────────────
-const STORAGE_KEY = 'eby_life_os';
-let state = {
-  startDate: null,
-  checks: {},
-  lastCheckDate: null,
-  partnerCount: 0,
-  partnerDots: [],
-  wins: [],
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// CONFIG
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+const SURL = 'https://fsxhcflzpztnzesukjia.supabase.co';
+const SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZzeGhjZmx6cHp0bnplc3VramlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjI2OTMsImV4cCI6MjA4OTIzODY5M30.HOXnI3WRBBdvKV37sTM1fs8FeRS2SAkCD2vyyC36xPE';
+const GC = ['#4caf7d','#5b9bd5','#d4845a','#9b7fd4','#c9a84c'];
+const GN = ['Wealth','Empire','Body','Influence','Life'];
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// STATE
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+const S = {
+  db: null,
+  dayNum: 1,
+  mood: null,
+  tasks: [],
+  custom: [],
+  done: new Set(),
+  goals: [],
+  metrics: { rev: 400000, fol: 157, debt: 5000000 },
   streak: 0,
-  lastStreakDate: null
+  totalWins: 0,
+  settings: {},
+  chatHist: [],
+  cel: { first: false, half: false, all: false }
 };
 
-function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-function load() {
-  const d = localStorage.getItem(STORAGE_KEY);
-  if (d) state = {...state, ...JSON.parse(d)};
-  if (!state.startDate) { state.startDate = new Date().toISOString(); save(); }
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// INIT
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+async function init() {
+  S.db = supabase.createClient(SURL, SKEY);
+  await Promise.all([loadSettings(), loadGoals(), loadMetrics()]);
+  renderStrip();
+  renderGoalsList();
+  renderMetrics();
+  await loadTodayLog();
+  updateHeader();
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
 }
 
-// ─── DAY COUNTER ─────────────────────────────────────────
-function getDayNumber() {
-  const start = new Date(state.startDate);
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// SUPABASE
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+async function loadSettings() {
+  const { data } = await S.db.from('settings').select('*').eq('id', 1).single();
+  if (!data) return;
+  S.settings = data;
+  S.streak = data.streak || 0;
+  S.totalWins = data.total_wins || 0;
+  const start = new Date(data.start_date);
   const now = new Date();
-  return Math.max(1, Math.floor((now - start) / 86400000) + 1);
+  start.setHours(0,0,0,0); now.setHours(0,0,0,0);
+  S.dayNum = Math.max(1, Math.floor((now - start) / 86400000) + 1);
 }
 
-function updateDayBadge() {
-  const d = getDayNumber();
-  document.getElementById('dayBadge').textContent = 'Day ' + d + ' of 500';
-  document.getElementById('dayNum').textContent = d;
+arync function loadGoals() {
+  const { data } = await S.db.from('goals').select('*').order('id');
+  if (data && data.length) S.goals = data;
 }
 
-// ─── CHECKLIST ───────────────────────────────────────────
-function getTodayKey() { return new Date().toISOString().slice(0,10); }
-
-function loadChecks() {
-  const today = getTodayKey();
-  if (state.lastCheckDate !== today) {
-    state.checks = {};
-    state.lastCheckDate = today;
-    save();
-  }
-  document.querySelectorAll('.check-item').forEach(el => {
-    const key = el.getAttribute('onclick').match(/'([^']+)'/)?.[1];
-    if (key && state.checks[key]) el.classList.add('done');
-  });
-  updateScore();
+arync function loadMetrics() {
+  const { data } = await S.db.from('metrics').select('*').order('metric_date',{ascending:false}).limit(1);
+  if (data && data.length) S.metrics = { rev: data[0].revenue, fol: data[0].followers, debt: data[0].debt };
 }
 
-function toggleCheck(el, key) {
-  el.classList.toggle('done');
-  state.checks[key] = el.classList.contains('done');
-  save();
-  updateScore();
+async function loadTodayLog() {
+  const { data } = await S.db.from('daily_logs').select('*').eq('log_date', today()).single();
+  if (!data) return;
+  S.mood = data.mood;
+  S.tasks = data.tasks_done || [];
+  S.custom = data.custom_tasks || [];
+  S.done = new Set([...S.tasks, ...S.custom].filter(t => t.done).map(t => t.id));
+  // Restore celebration guard
+  const total = S.tasks.length + S.custom.length;
+  S.cel.first = S.done.size >= 1;
+  S.cel.half = S.done.size >= Math.floor(total / 2) && total > 1;
+  S.cel.all = S.done.size === total && total > 0;
+  if (S.tasks.length > 0) showTasks();
 }
 
-function updateScore() {
-  const total = document.querySelectorAll('.check-item').length;
-  const done = document.querySelectorAll('.check-item.done').length;
-  const pct = done / total;
-  const circumference = 163.4;
-  const offset = circumference - (pct * circumference);
-  document.getElementById('scoreRing').style.strokeDashoffset = offset;
-  document.getElementById('scoreRingText').textContent = done + '/' + total;
-  const msgs = ['Start your day. Check off each win.','Good start. Keep going.','Halfway there. You\'re building momentum.','Strong day. Push to the finish.','6 done. One more. Don\'t stop now.','Perfect day. Every non-negotiable hit. This is who you\'re becoming.'];
-  document.getElementById('scoreMsg').textContent = msgs[Math.min(done, msgs.length-1)];
-}
-
-// ─── PARTNER DOTS ─────────────────────────────────────────
-function buildPartnerDots() {
-  const grid = document.getElementById('pDots');
-  grid.innerHTML = '';
-  for (let i = 1; i <= 50; i++) {
-    const d = document.createElement('div');
-    d.className = 'p-dot' + (state.partnerDots.includes(i) ? ' on' : '');
-    d.textContent = i;
-    d.onclick = () => {
-      if (state.partnerDots.includes(i)) {
-        state.partnerDots = state.partnerDots.filter(x => x !== i);
-        d.classList.remove('on');
-      } else {
-        state.partnerDots.push(i);
-        d.classList.add('on');
-      }
-      state.partnerCount = state.partnerDots.length;
-      updatePartnerCount();
-      save();
-    };
-    grid.appendChild(d);
-  }
-  updatePartnerCount();
-}
-
-function updatePartnerCount() {
-  document.getElementById('pCount').textContent = state.partnerCount;
-  document.getElementById('pBar').style.width = Math.round(state.partnerCount / 50 * 100) + '%';
-}
-
-// ─── WINS ─────────────────────────────────────────────────
-function loadWins() {
-  const list = document.getElementById('winsList');
-  list.innerHTML = '';
-  state.wins.slice().reverse().forEach(w => {
-    const c = document.createElement('div');
-    c.className = 'win-card';
-    c.innerHTML = '<div class="win-date">' + w.date + '</div><div class="win-text">' + w.text + '</div>';
-    list.appendChild(c);
-  });
-}
-
-function logWin() {
-  const val = document.getElementById('winInput').value.trim();
-  if (!val) return;
-  const today = new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
-  state.wins.push({ date: today, text: val });
-  save();
-  loadWins();
-  document.getElementById('winInput').value = '';
-  addMsg('winChat', val, 'user');
-  callClaude("Eby just logged this win: '" + val + "' — Celebrate it genuinely in 2 lines. Connect it to one of his 5 goals. Then give him one next action to build momentum.", 'winsList', true);
-}
-
-// ─── SCREEN NAVIGATION ────────────────────────────────────
-function showScreen(name, el) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('screen-' + name).classList.add('active');
-  el.classList.add('active');
-}
-
-// ─── CHAT / CLAUDE API ───────────────────────────────────
-
-
-function addMsg(containerId, text, role) {
-  const wrap = document.getElementById(containerId);
-  if (!wrap) return;
-  const msg = document.createElement('div');
-  msg.className = 'msg ' + role;
-  msg.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
-  wrap.appendChild(msg);
-  wrap.scrollTop = wrap.scrollHeight;
-}
-
-function addTyping(containerId) {
-  const wrap = document.getElementById(containerId);
-  if (!wrap) return null;
-  const t = document.createElement('div');
-  t.className = 'msg ai typing';
-  t.innerHTML = '<span></span><span></span><span></span>';
-  wrap.appendChild(t);
-  wrap.scrollTop = wrap.scrollHeight;
-  return t;
-}
-
-// BACKEND_URL will be replaced with your Railway URL
-const BACKEND_URL = '/.netlify/functions';
-
-async function callClaude(userMsg, chatId, inline) {
-  const typing = addTyping(chatId);
-  try {
-    const res = await fetch(BACKEND_URL + '/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: userMsg })
-    });
-    const data = await res.json();
-    if (typing) typing.remove();
-    const reply = data.reply || data.error || 'Something went wrong. Try again.';
-    addMsg(chatId, reply, 'ai');
-  } catch(e) {
-    if (typing) typing.remove();
-    addMsg(chatId, 'Connection error. Check your internet and try again.', 'ai');
-  }
-}
-
-function sendChat() {
-  const val = document.getElementById('chatInput').value.trim();
-  if (!val) return;
-  addMsg('chatWrap', val, 'user');
-  document.getElementById('chatInput').value = '';
-  const prompt = "Eby's daily check-in: " + val + " — Give exactly: 1) 3 focus actions for today, 2) 1-2 things to drop today, 3) One line of fire to close. Under 150 words.";
-  callClaude(prompt, 'chatWrap', false);
-}
-
-function quickPrompt(type) {
-  const prompts = {
-    weekly: "Eby wants his weekly Life OS review. Ask him: current revenue, follower count, debt progress, non-negotiables this week, biggest win, biggest struggle. Then give honest assessment + top 2 priorities for next week.",
-    correct: "Eby wants a course correction. Something isn't working or has changed. Ask him what shifted — then redesign his focus for the next 30 days to get back on the fastest path.",
-    trip: "Eby wants to plan a trip. Rules: ≤₹15K budget, must feed 2+ goals simultaneously, must produce Higgsfield content. Suggest 2-3 Kerala destinations and exactly what to create there."
+async function saveLog() {
+  const total = S.tasks.length + S.custom.length;
+  const score = S.done.size;
+  const payload = {
+    log_date: today(),
+    day_number: S.dayNum,
+    mood: S.mood,
+    tasks_done: S.tasks.map(t => ({ ...t, done: S.done.has(t.id) })),
+    custom_tasks: S.custom.map(t => ({ ...t, done: S.done.has(t.id) })),
+    score, total_tasks: total,
+    updated_at: new Date().toISOString()
   };
-  addMsg('chatWrap', {weekly:'Weekly review', correct:'Course correction', trip:'Plan a trip'}[type], 'user');
-  callClaude(prompts[type], 'chatWrap', false);
-}
-
-function getContentIdeas() {
-  const val = document.getElementById('contentInput').value.trim();
-  const prompt = "Give Eby 7 Higgsfield-ready Malayalam visual story content ideas" + (val ? " based on his week: " + val : " for this week") + ". Format: Malayalam title + one-line cinematic visual description. All based on his real life: Adivinar business, Club Catalyst resort, transformation journey, mindset. Bold, not generic.";
-  if (val) addMsg('contentChat', val, 'user');
-  callClaude(prompt, 'contentChat', false);
-}
-
-function get30DaySprint() {
-  addMsg('contentChat', '30-day content sprint', 'user');
-  callClaude("Give Eby a specific 30-day Malayalam content sprint plan to grow from 157 to 5,000 followers using Higgsfield visual storytelling. What to post, how often, what hooks work for Malayalam audience on Instagram and YouTube Shorts. Week by week breakdown.", 'contentChat', false);
-}
-
-function claritySession() {
-  addMsg('attractionChat', 'Relationship clarity session', 'user');
-  callClaude("Guide Eby through 5 honest reflection questions about his relationship wiring. He is 34, unmarried, exploring whether polygamy is his long-term truth or whether a committed relationship is what he actually wants beneath the surface. No judgment. No agenda. Just questions that reveal what he actually feels.", 'attractionChat', false);
-}
-
-function reviewMilestones() {
-  addMsg('msChat', 'Review my milestones', 'user');
-  callClaude("Eby wants to review his 500-day milestone map. He started with 157 followers, ₹4L/month, ₹50L debt. Ask him what day he is on and his current numbers — then tell him what's on track, what's behind, and exactly what to do this week.", 'msChat', false);
-}
-
-function generateWarCry() {
-  addMsg('identityChat', 'Generate morning war cry', 'user');
-  callClaude("Write Eby a 60-second morning war cry. Malayalam and English mixed naturally. Starting from ₹50L debt, 157 followers, building to ₹100Cr, Greek god physique, 1M+ influence, 50-person attraction pool. From Kochi. Make it feel like a man who has already decided. Bold, grounded, not self-help.", 'identityChat', false);
-}
-
-// Enter key to send chat
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey && document.activeElement.id === 'chatInput') {
-    e.preventDefault();
-    sendChat();
+  await S.db.from('daily_logs').upsert(payload, { onConflict: 'log_date' });
+  // streak logic
+  if (score > 0 && S.settings.last_active_date !== today()) {
+    const yest = new Date(); yest.setDate(yest.getDate()-1);
+    const ystr = yest.toISOString().split('T')[0];
+    const newStreak = S.settings.last_active_date === ystr ? S.streak + 1 : 1;
+    S.streak = newStreak;
+    S.settings.streak = newStreak;
+    S.settings.last_active_date = today();
+    await S.db.from('settings').update({
+      streak: newStreak, last_active_date: today(), updated_at: new Date().toISOString()
+    }).eq('id', 1);
+    // streak milestone celebrations
+    if (newStreak === 3) cel('ð¥','3-Day Streak!','Three in a row. The habit is forming. Keep the chain alive.');
+    else if (newStreak === 7) cel('â¡','7-Day Streak!','One full week straight. Most people quit before this. You didn\'t.');
+    else if (newStreak === 30) cel('ð','30-Day Streak!','Thirty consecutive days. You\'re genuinely not the same person who started this.');
+    updateHeader();
   }
-});
-
-// ─── INIT ─────────────────────────────────────────────────
-window.addEventListener('load', () => {
-  load();
-  setTimeout(() => {
-    document.getElementById('loadScreen').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'flex';
-    updateDayBadge();
-    loadChecks();
-    buildPartnerDots();
-    loadWins();
-  }, 1600);
-});
-
-// Service worker registration
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
 }
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// NAVIGATION
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function goTo(name, btn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b => b.classList.remove('on'));
+  document.getElementById('screen-' + name).classList.add('active');
+  btn.classList.add('on');
+  if (name === 'wins') loadWins();
+}
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// HEADER
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function updateHeader() {
+  document.getElementById('hdr-day').textContent = 'Day ' + S.dayNum;
+  const left = Math.max(0, 500 - S.dayNum);
+  const dateStr = new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+  document.getElementById('hdr-sub').textContent = left + ' days left Â· ' + dateStr;
+  const s = S.streak;
+  document.getElementById('hdr-streak-txt').textContent = s + (s === 1 ? ' day' : ' day') + ' streak';
+}
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// GOALS STRIP
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function renderStrip() {
+  const goals = S.goals.length ? S.goals : GN.map((n,i) => ({ id:i+1, name:n, progress:1 }));
+  document.getElementById('gstrip').innerHTML = goals.map((g, i) => {
+    const c = GC[i], p = g.progress || 0, r = 16;
+    const circ = 2 * Math.PI * r, dash = (p/100)*circ;
+    return `<div class="gs-item" onclick="goTo('goals',document.querySelectorAll('.nb')[1])">
+      <div class="gs-ring">
+        <svg width="38" height="38" style="position:absolute;top:0;left:0;transform:rotate(-90deg)">
+          <circle cx="19" cy="19" r="${r}" fill="none" stroke="#1e1e1e" stroke-width="2.5"/>
+          <circle cx="19" cy="19" r="${r}" fill="none" stroke="${c}" stroke-width="2.5"
+            stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}" stroke-linecap="round"/>
+        </svg>
+        <span class="gs-pct" style="color:${c}">${p}%</span>
+      </div>
+      <div class="gs-name" style="color:${c}">${GN[i]}</div>
+    </div>`;
+  }).join('');
+}
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// TODAY â MOOD
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function pickMood(btn) {
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  S.mood = btn.dataset.mood;
+  document.getElementById('build-btn').disabled = false;
+}
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// TODAY â BUILD DAY (AI task generation)
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+async function buildDay() {
+  const btn = document.getElementById('build-btn');
+  const sit = document.getElementById('sit-input').value.trim();
+  btn.disabled = true; btn.textContent = 'Building your day...';
+
+  const counts = { fired_up:15, focused:12, steady:10, tired:7, rough:4 };
+  const n = counts[S.mood] || 10;
+
+  const prompt = `Generate a personalised daily task list for Eby on Day ${S.dayNum} of his 500-day system.
+Mood: ${S.mood}${sit ? '\nSituation: ' + sit : ''}
+
+Return ONLY valid JSON array â `nomarkdown, no extra text, no code block.
+Exactly ${n} tasks. Each task:
+{
+  "id": "t1" (unique, sequential),
+  "title": "action verb + object, max 7 words, never an outcome",
+  "category": "mind" | "skills" | "body" | "network" | "business",
+  "duration": "X min" or "daily" or "any",
+  "goal_id": 1-5,
+  "min_viable": true (only for the 3 simplest tasks)
+}
+
+Source habits to draw from:
+MIND (goal 5): Guided visualisation 10min | EFT 10min | Gratitude 3 things | Affirmations 5min | Read 5 pages
+SKILLS (goal 4): English training 15min | Etiquette/world tip | Style check
+BODY (goal 3): Any workout | Kaggle exercises daily | Supplements + diet | Skincare morning | Face exercise 5min
+NETWORK (goal 2): Send 10 reach-out messages | 1 genuine conversation | 1 BNI action
+BUSINESS (goal 1): Post Higgsfield content | Club Catalyst 10 actions | Improve Adivinar process | Finance concept | Weekly review
+
+For "${S.mood}" day, weight tasks accordingly.
+Mark exactly 3 tasks min_viable:true â the three smallest, fastest actions.`;
+
+  try {
+    const res = await ai(prompt, {}, 1500);
+    const m = res.match(/\[[\s\S]*\]/);
+    if (!m) throw new Error('no json');
+    S.tasks = JSON.parse(m[0]);
+    S.custom = []; S.done = new Set();
+    S.cel = { first:false, half:false, all:false };
+    showTasks();
+    await saveLog();
+  } catch (e) {
+    S.tasks = fallbackTasks(n);
+    S.custom = []; S.done = new Set();
+    S.cel = { first:false, half:false, all:false };
+    showTasks();
+    await saveLog();
+    showToast('Used offline task list');
+  }
+  btn.disabled = false; btn.textContent = 'Build My Day';
+}
+
+function fallbackTasks(n) {
+  return [
+    {id:'f1',title:'Complete guided visualisation',category:'mind',duration:'10 min',goal_id:5,min_viable:true},
+    {id:'f2',title:'Write 3 gratitude items',category:'mind',duration:'5 min',goal_id:5,min_viable:true},
+    {id:'f3',title:'Speak affirmations aloud',category:'mind',duration:'5 min',goal_id:5,min_viable:true},
+    {id:'f4',title:'Do EFT session',category:'mind',duration:'10 min',goal_id:5,min_viable:false},
+    {id:'f5',title:'Read 5 pages',category:'skills',duration:'15 min',goal_id:4,min_viable:false},
+    {id:'f6',title:'English training session',category:'skills',duration:'15 min',goal_id:4,min_viable:false},
+    {id:'f7',title:'Learn 1 etiquette tip',category:'skills',duration:'5 min',goal_id:4,min_viable:false},
+    {id:'f8',title:'Complete any workout',category:'body',duration:'any',goal_id:3,min_viable:false},
+    {id:'f9',title:'Do Kaggle exercises',category:'body',duration:'daily',goal_id:3,min_viable:false},
+    {id:'f10',title:'Take supplements + log diet',category:'body',duration:'daily',goal_id:3,min_viable:false},
+    {id:'f11',title:'Morning skincare routine',category:'body',duration:'5 min',goal_id:3,min_viable:false},
+    {id:'f12',title:'Face exercises',category:'body',duration:'5 min',goal_id:3,min_viable:false},
+    {id:'f13',title:'Send 10 reach-out messages',category:'network',duration:'20 min',goal_id:2,min_viable:false},
+    {id:'f14',title:'Have 1 genuine conversation',category:'network',duration:'10 min',goal_id:2,min_viable:false},
+    {id:'f15',title:'Complete 1 BNI action',category:'network',duration:'10 min',goal_id:2,min_viable:false},
+    {id:'f16',title:'Post 1 Higgsfield content',category:'business',duration:'30 min',goal_id:1,min_viable:false},
+    {id:'f17',title:'10 Club Catalyst daily actions',category:'business',duration:'30 min',goal_id:1,min_viable:false},
+    {id:'f18',title:'Improve 1 Adivinar process',category:'business',duration:'20 min',goal_id:1,min_viable:false},
+    {id:'f19',title:'Learn 1 finance concept',category:'business',duration:'10 min',goal_id:1,min_viable:false},
+    {id:'f20',title:'Weekly review + optimise',category:'business',duration:'30 min',goal_id:1,min_viable:false}
+  ].slice(0, n);
+}
+
+function showTasks() {
+  document.getElementById('today-setup').style.display = 'none';
+  document.getElementById('today-tasks').style.display = 'block';
+  renderTasks();
+  updateProg();
+}
+
+function renderTasks() {
+  const all = [...S.tasks, ...S.custom];
+  document.getElementById('task-list').innerHTML = all.map(t => {
+    const done = S.done.has(t.id);
+    const color = GC[(t.goal_id||1)-1] || '#888';
+    return `<div class="task ${done?'done':''}" id="tk-${t.id}" onclick="toggleTask('${t.id}')">
+      <div class="t-check">${done?'â':''}</div>
+      <div class="t-body">
+        <div class="t-title">${t.title}</div>
+        <div class="t-meta">
+          <span class="t-cat">${t.category||''}</span>
+          ${t.duration ? `<span class="t-dur">${t.duration}</span>` : ''}
+        </div>
+      </div>
+      <div class="t-dot" style="background:${color}"></div>
+    </div>`;
+  }).join('');
+}
+
+async function toggleTask(id) {
+  if (S.done.has(id)) {
+    S.done.delete(id);
+  } else {
+    S.done.add(id);
+    const all = [...S.tasks, ...S.custom];
+    const total = all.length, done = S.done.size;
+    if (!S.cel.first && done === 1) {
+      S.cel.first = true;
+      cel('ð¥','First one down!','The machine is moving. That\'s all it takes â one action to break inertia.');
+    } else if (!S.cel.half && total > 1 && done >= Math.floor(total/2)) {
+      S.cel.half = true;
+      cel('â¡','Halfway there!',`${done} done. You pushed through the middle â momentum belongs to you now.`);
+    } else if (!S.cel.all && done === total && total > 0) {
+      S.cel.all = true;
+      cel('ð','Day complete!',`${total}/${total}. Day ${S.dayNum} of 500 â fully done. This is exactly how empires are built.`);
+    }
+  }
+  const el = document.getElementById('tk-'+id);
+  if (el) {
+    el.classList.toggle('done', S.done.has(id));
+    el.querySelector('.t-check').textContent = S.done.has(id) ? 'â' : '';
+  }
+  updateProg();
+  await saveLog();
+}
+
+function updateProg() {
+  const total = S.tasks.length + S.custom.length;
+  const done = S.done.size;
+  const pct = total > 0 ? Math.round((done/total)*100) : 0;
+  document.getElementById('prog-lbl').textContent = `${done} of ${total} done`;
+  document.getElementById('prog-num').textContent = pct + '%';
+  document.getElementById('prog-fill').style.width = pct + '%';
+}
+
+function addCustomTask() {
+  const inp = document.getElementById('ct-input');
+  const txt = inp.value.trim();
+  if (!txt) return;
+  S.custom.push({ id:'c'+Date.now(), title:txt, category:'custom', duration:'', goal_id:null, done:false });
+  inp.value = '';
+  renderTasks(); updateProg(); saveLog();
+  showToast('Task added');
+}
+
+function resetDay() {
+  document.getElementById('today-setup').style.display = 'block';
+  document.getElementById('today-tasks').style.display = 'none';
+  // restore mood if exists
+  if (S.mood) {
+    document.querySelectorAll('.mood-btn').forEach(b => {
+      if (b.dataset.mood === S.mood) b.classList.add('on');
+    });
+    document.getElementById('build-btn').disabled = false;
+  }
+}
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// GOALS SCREEN
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function renderGoalsList() {
+  const goals = S.goals.length ? S.goals : GN.map((n,i) => ({
+    id:i+1, name:n, target:['â¹100Cr personal net worth','Master connector + ecosystem builder','Greek god physique + 50-partner pool','1M+ followers â Malayalam first','Extraordinary life + relationship truth'][i], progress:1
+  }));
+  document.getElementById('goals-list').innerHTML = goals.map((g, i) => {
+    const c = GC[i], p = g.progress || 0;
+    return `<div class="goal-card">
+      <div class="goal-top" onclick="toggleGoal(${g.id})">
+        <div class="goal-bar" style="background:${c}"></div>
+        <div class="goal-info">
+          <div class="goal-name">${g.name}</div>
+          <div class="goal-tgt">${g.target}</div>
+        </div>
+        <div class="goal-pct" style="color:${c}">${p}%</div>
+      </div>
+      <div class="goal-prog"><div class="goal-prog-fill" style="background:${c};width:${p}%"></div></div>
+      <div class="goal-edit" id="ge-${g.id}">
+        <div class="frow">
+          <div class="lbl">Progress %</div>
+          <input type="number" class="inp" id="gp-${g.id}" value="${p}" min="0" max="100">
+        </div>
+        <div class="frow">
+          <div class="lbl">Target</div>
+          <input type="text" class="inp" id="gt-${g.id}" value="${g.target}">
+        </div>
+        <button class="btn-accent" style="background:${c};width:100%;text-align:center;padding:10px" onclick="saveGoal(${g.id})">Save</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleGoal(id) {
+  document.getElementById('ge-'+id).classList.toggle('open');
+}
+
+async function saveGoal(id) {
+  const p = parseInt(document.getElementById('gp-'+id).value) || 0;
+  const t = document.getElementById('gt-'+id).value;
+  await S.db.from('goals').update({ progress:p, target:t, updated_at:new Date().toISOString() }).eq('id', id);
+  const g = S.goals.find(g => g.id === id);
+  if (g) { g.progress = p; g.target = t; }
+  renderGoalsList(); renderStrip();
+  document.getElementById('ge-'+id).classList.remove('open');
+  showToast('Goal updated â');
+}
+
+function renderMetrics() {
+  const fmt = n => n >= 10000000 ? 'â¹'+(n/10000000).toFixed(1)+'Cr' :
+                   n >= 100000  ? 'â¹'+(n/100000).toFixed(1)+'L' :
+                   n >= 1000    ? 'â¹'+(n/1000).toFixed(0)+'K' : 'â¹'+n;
+  document.getElementById('met-display').innerHTML = `
+    <div class="met-item">
+      <div class="met-val" style="color:var(--g1)">${fmt(S.metrics.rev)}</div>
+      <div class="met-lbl">Revenue/mo</div>
+    </div>
+    <div class="met-item">
+      <div class="met-val" style="color:var(--g4)">${(S.metrics.fol||0).toLocaleString('en-IN')}</div>
+      <div class="met-lbl">Followers</div>
+    </div>
+    <div class="met-item">
+      <div class="met-val" style="color:var(--g3)">${fmt(S.metrics.debt)}</div>
+      <div class="met-lbl">Debt</div>
+    </div>`;
+  document.getElementById('m-rev').value = S.metrics.rev;
+  document.getElementById('m-fol').value = S.metrics.fol;
+  document.getElementById('m-debt').value = S.metrics.debt;
+}
+
+async function saveMetrics() {
+  const rev  = parseInt(document.getElementById('m-rev').value)  || S.metrics.rev;
+  const fol  = parseInt(document.getElementById('m-fol').value)  || S.metrics.fol;
+  const debt = parseInt(document.getElementById('m-debt').value) || S.metrics.debt;
+  S.metrics = { rev, fol, debt };
+  await S.db.from('metrics').upsert({ metric_date:today(), revenue:rev, followers:fol, debt }, { onConflict:'metric_date' });
+  renderMetrics();
+  showToast('Numbers saved â');
+}
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// LEARN SCREEN
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function toggleLearn(key) {
+  const body = document.getElementById('lb-'+key);
+  const arrow = document.getElementById('la-'+key);
+  body.classList.toggle('open');
+  arrow.classList.toggle('open');
+  arrow.textContent = body.classList.contains('open') ? 'â¼' : 'â¶';
+}
+
+function learnPrompt(key) {
+  const day = S.dayNum;
+  const rev = (S.metrics.rev/100000).toFixed(1);
+  const debt = (S.metrics.debt/100000).toFixed(0);
+  if (key === 'en') return `Give Eby one practical English lesson. He is a 34-year-old entrepreneur from Kerala, India, building global influence. Day ${day} of 500.
+
+Format exactly:
+WORD/PHRASE: [the word or phrase]
+MEANING: [clear definition, 1 sentence]
+EXAMPLE: [natural business or leadership example sentence]
+PRO TIP: [one tip on using it naturally in conversation or content]
+
+Choose something useful for an entrepreneur doing international business. Not textbook â real world.`;
+
+  if (key === 'etq') return `Give Eby one sophisticated etiquette or world knowledge tip. He is building a top 1% life from Kochi, Kerala. Day ${day} of 500.
+
+Format exactly:
+TIP: [the specific tip, bold and actionable]
+WHY IT MATTERS: [2 sentences â how this elevates his status or relationships]
+IN PRACTICE: [specific scenario where Eby applies this â make it Kerala/India-relevant where possible]
+
+Choose from: dining etiquette, global customs, conversation mastery, body language, hospitality, cultural intelligence, travel sophistication.`;
+
+  if (key === 'fin') return `Give Eby one wealth-building or finance concept. Context: â¹${debt}L debt (clearing by Day 300), building toward â¹100Cr net worth. Currently earning â¹${rev}L/month. Day ${day} of 500.
+
+Format exactly:
+CONCEPT: [name]
+WHAT IT IS: [2-sentence explanation, no jargon]
+HOW IT APPLIES TO EBY: [specific to his situation â debt payoff, Adivinar revenue, Club Catalyst, investing]
+THIS WEEK: [one concrete action he can take this week based on this concept]`;
+
+  if (key === 'sty') return `Give Eby one specific style or presence upgrade tip. He is building a Greek god physique + commanding, magnetic presence â a bad-boy-doing-good entrepreneur from Kochi. Day ${day} of 500.
+
+Format exactly:
+TIP: [the specific, actionable tip]
+WHY: [1 sentence â how this creates attraction or authority]
+TODAY: [exactly how he applies or thinks about this today]
+INVEST: [one thing worth spending on this month related to this â give a specific product or category]`;
+  return `Give a useful daily tip for Day ${day}.`;
+}
+
+async function genLesson(key, btn) {
+  btn.textContent = 'Generating...'; btn.disabled = true;
+  const placeholder = document.getElementById('lp-'+key);
+  const content = document.getElementById('lc-'+key);
+  placeholder.style.display = 'none';
+  content.innerHTML = '<div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  content.style.display = 'block';
+  try {
+    const res = await ai(learnPrompt(key), { dayNum:S.dayNum, metrics:S.metrics }, 700);
+    content.textContent = res;
+  } catch (e) {
+    content.textContent = 'Failed to generate. Tap to retry.';
+  }
+  btn.textContent = 'âº Regenerate'; btn.disabled = false;
+}
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// COACH SCREEN
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+async function genWarCry() {
+  const btn = document.getElementById('warcry-btn');
+  const display = document.getElementById('warcry-txt');
+  btn.disabled = true; btn.textContent = 'Channeling...';
+  display.innerHTML = '<div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  const prompt = `Write Eby's personal battle cry for Day ${S.dayNum} of 500.
+He started with â¹50L debt, from Kochi, Kerala. Building to â¹100Cr, 1M followers, Greek physique, an empire. Streak: ${S.streak} days.
+
+Rules:
+- 2-4 sentences, first person ("I am..." / "I will..." / "Today...")
+- Raw, emotional, bold â not corporate motivational-poster
+- Reference something specific: the debt origin, Day ${S.dayNum} of 500, the comeback arc, Kerala
+- Reads like a man who has everything to build and nothing to lose
+- No hashtags, no emojis`;
+  try {
+    const res = await ai(prompt, { dayNum:S.dayNum, streak:S.streak, metrics:S.metrics }, 400);
+    display.textContent = res;
+  } catch (e) {
+    display.textContent = 'Something went wrong. You already know what to do â go.';
+  }
+  btn.textContent = 'âº Regenerate'; btn.disabled = false;
+}
+
+async function genAffirmations() {
+  const btn = document.getElementById('aff-btn');
+  const list = document.getElementById('aff-list');
+  btn.disabled = true; btn.textContent = 'Generating...';
+  list.innerHTML = '<div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  const prompt = `Generate 5 identity affirmations for Eby on Day ${S.dayNum} of 500.
+Identity: Kochi entrepreneur, â¹${(S.metrics.rev/100000).toFixed(1)}L/month revenue, ${S.metrics.fol} followers, â¹${(S.metrics.debt/100000).toFixed(0)}L debt being cleared.
+Building: â¹100Cr wealth, Greek physique, 1M followers, empire network.
+
+Rules:
+- Present tense identity ONLY ("I am..." "I have..." "I attract...") â never future tense
+- 1 sentence each, punchy
+- Specific to his actual life â wealth, body, influence, Kochi, the journey
+- Sound real and earned, not generic
+Return exactly 5 affirmations, one per line, no numbers, no quotes, no extra text.`;
+  try {
+    const res = await ai(prompt, { dayNum:S.dayNum, metrics:S.metrics }, 500);
+    const lines = res.split('\n').filter(l => l.trim()).slice(0,5);
+    list.innerHTML = lines.map(l => `<div class="aff-item"><div class="aff-dot"></div><div class="aff-text">${l.trim()}</div></div>`).join('');
+  } catch (e) {
+    list.innerHTML = '<div class="empty">Failed to generate. Try again.</div>';
+  }
+  btn.textContent = 'âº Regenerate'; btn.disabled = false;
+}
+
+async function sendMsg() {
+  const inp = document.getElementById('chat-inp');
+  const txt = inp.value.trim();
+  if (!txt) return;
+  const msgs = document.getElementById('chat-msgs');
+  msgs.innerHTML += `<div class="msg u">${txt}</div>`;
+  inp.value = '';
+  S.chatHist.push({ role:'user', content:txt });
+  const lid = 'ld'+Date.now();
+  msgs.innerHTML += `<div class="msg a" id="${lid}"><div class="dots" style="padding:4px 0"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+  try {
+    const res = await ai(txt, {
+      dayNum:S.dayNum, mood:S.mood, streak:S.streak,
+      goals:S.goals, metrics:S.metrics,
+      situation:document.getElementById('sit-input')?.value||''
+    }, 1000, S.chatHist.slice(-8));
+    document.getElementById(lid).textContent = res;
+    S.chatHist.push({ role:'assistant', content:res });
+  } catch (e) {
+    document.getElementById(lid).textContent = 'Failed to get response. Try again.';
+  }
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// WINS SCREEN
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+async function logWin() {
+  const inp = document.getElementById('win-inp');
+  const txt = inp.value.trim();
+  if (!txt) return;
+  const btn = document.getElementById('log-btn');
+  btn.disabled = true; btn.textContent = 'Logging...';
+  try {
+    const prompt = `Eby just logged this win on Day ${S.dayNum} of 500: "${txt}"
+Write a 2-sentence celebration response.
+- Direct and genuine, not generic
+- Connect it to one of his 5 goals (wealth, empire, body, influence, life)
+- Acknowledge the action, not just the result
+- End with one line of forward momentum
+Max 60 words total.`;
+    const aiReply = await ai(prompt, { dayNum:S.dayNum, goals:S.goals }, 300);
+    await S.db.from('wins').insert({ win_date:today(), day_number:S.dayNum, text:txt, goal_id:null });
+    S.totalWins++;
+    await S.db.from('settings').update({ total_wins:S.totalWins }).eq('id',1);
+    inp.value = '';
+    if (S.totalWins === 10) cel('ð','10 Wins Logged!','Ten recorded. The evidence file of your empire is growing. Every win here is proof that you showed up.');
+    else if (S.totalWins === 50) cel('ð¥','50 Wins!','Fifty moments of action in the log. This is not a hobby anymore. This is a system. Keep going.');
+    else cel('â­','Win logged.', aiReply);
+    loadWins();
+  } catch (e) { showToast('Failed to log win â try again'); }
+  btn.disabled = false; btn.textContent = 'Log This Win â­';
+}
+
+async function loadWins() {
+  const el = document.getElementById('wins-list');
+  el.innerHTML = '<div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  const { data } = await S.db.from('wins').select('*').order('created_at',{ascending:false}).limit(50);
+  if (!data || !data.length) {
+    el.innerHTML = '<div class="empty">No wins logged yet.<br>Every action counts â log your first one above.</div>';
+    return;
+  }
+  el.innerHTML = data.map(w => {
+    const c = w.goal_id ? GC[(w.goal_id-1)] : null;
+    const gn = w.goal_id ? GN[(w.goal_id-1)] : null;
+    return `<div class="win-item">
+      <div class="win-text">${w.text}</div>
+      <div class="win-footer">
+        <span class="win-day">Day ${w.day_number||'?'} Â· ${fmtDate(w.win_date)}</span>
+        ${gn ? `<span class="win-goal-tag" style="color:${c}">${gn}</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// AI HELPER
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+async function ai(message, context = {}, maxTokens = 800, history = []) {
+  const r = await fetch('/.netlify/functions/chat', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      message,
+      context:{ dayNum:S.dayNum, mood:S.mood, streak:S.streak, goals:S.goals, metrics:S.metrics, ...context },
+      maxTokens,
+      history
+    })
+  });
+  const d = await r.json();
+  if (d.error) throw new Error(d.error);
+  return d.reply;
+}
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// CELEBRATION
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function cel(emoji, title, msg) {
+  document.getElementById('cel-emoji').textContent = emoji;
+  document.getElementById('cel-title').textContent = title;
+  document.getElementById('cel-msg').textContent = msg;
+  document.getElementById('cel').classList.add('show');
+}
+function closeCel() { document.getElementById('cel').classList.remove('show'); }
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// TOAST
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// UTILS
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function today() { return new Date().toISOString().split('T')[0]; }
+function fmtDate(d) {
+  if (!d) return '';
+  return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+}
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// START
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+init();
 </script>
 </body>
 </html>
