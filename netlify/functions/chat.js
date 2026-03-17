@@ -1,67 +1,135 @@
-exports.handler = async function (event) {
-        if (event.httpMethod === 'OPTIONS') {
-                    return {
-                                    statusCode: 200,
-                                    headers: {
-                                                        'Access-Control-Allow-Origin': '*',
-                                                        'Access-Control-Allow-Headers': 'Content-Type',
-                                                        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-                                    },
-                                    body: '',
-                    };
-        }
+const fetch = require('node-fetch');
 
-        try {
-                    const { message } = JSON.parse(event.body);
+exports.handler = async (event) => {
+  if (event.httpMethod !== 'POST') {
+    return { statusCode: 405, body: 'Method not allowed' };
+  }
 
-            const apiKey = process.env.ANTHROPIC_API_KEY;
-                    console.log('API key prefix:', apiKey ? apiKey.substring(0, 20) : 'MISSING');
+  const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+  if (!ANTHROPIC_API_KEY) {
+    return { statusCode: 500, body: JSON.stringify({ error: 'API key not configured' }) };
+  }
 
-            const response = await fetch('https://api.anthropic.com/v1/messages', {
-                            method: 'POST',
-                            headers: {
-                                                'Content-Type': 'application/json',
-                                                'x-api-key': apiKey,
-                                                'anthropic-version': '2023-06-01',
-                            },
-                            body: JSON.stringify({
-                                                                model: 'claude-haiku-4-5',
-                                                max_tokens: 1024,
-                                                system:
-                                                                        "You are Eby's personal Life OS coach. Eby is a 34-year-old entrepreneur from Kochi, India. He runs Adivinar (AI automation agency), is building Club Catalyst resort, and is on a 500-day transformation. Goals: Rs100Cr net worth, 1M+ followers (Malayalam-first content), Greek god physique, 50-partner pool, clearing Rs50L debt. Current: Rs4L/month revenue, 157 followers, Day 1 of 500. Be direct, sharp, no fluff. Speak like a high-performance coach who knows his whole life context.",
-                                                messages: [{ role: 'user', content: message }],
-                            }),
-            });
+  try {
+    const { message, context, maxTokens, history } = JSON.parse(event.body);
+    if (!message) return { statusCode: 400, body: JSON.stringify({ error: 'Message required' }) };
 
-            const rawText = await response.text();
-                    console.log('API status:', response.status);
-                    console.log('API response:', rawText.substring(0, 500));
+    const systemPrompt = buildSystemPrompt(context || {});
 
-            const data = JSON.parse(rawText);
+    // Build messages array: conversation history + current message
+    const messages = [
+      ...(Array.isArray(history) ? history.slice(-10) : []),
+      { role: 'user', content: message }
+    ];
 
-            if (!response.ok) {
-                            const errType = data.error?.type || 'unknown';
-                            const errMsg = data.error?.message || JSON.stringify(data);
-                            return {
-                                                statusCode: 500,
-                                                headers: { 'Access-Control-Allow-Origin': '*' },
-                                                body: JSON.stringify({ error: errType + ': ' + errMsg }),
-                            };
-            }
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: maxTokens || 2000,
+        system: systemPrompt,
+        messages
+      })
+    });
 
-            const reply = data.content[0].text;
+    const data = await response.json();
+    if (data.error) return { statusCode: 400, body: JSON.stringify({ error: data.error.message }) };
 
-            return {
-                            statusCode: 200,
-                            headers: { 'Access-Control-Allow-Origin': '*' },
-                            body: JSON.stringify({ reply }),
-            };
-        } catch (err) {
-                    console.log('Catch error:', err.message);
-                    return {
-                                    statusCode: 500,
-                                    headers: { 'Access-Control-Allow-Origin': '*' },
-                                    body: JSON.stringify({ error: 'catch: ' + err.message }),
-                    };
-        }
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({ reply: data.content?.[0]?.text || 'No response.' })
+    };
+  } catch (err) {
+    return { statusCode: 500, body: JSON.stringify({ error: 'Failed: ' + err.message }) };
+  }
 };
+
+function buildSystemPrompt(ctx) {
+  const {
+    dayNum = 1,
+    mood = 'normal',
+    goals = [],
+    metrics = {},
+    streak = 0,
+    recentWins = [],
+    recentLogs = [],
+    situation = ''
+  } = ctx;
+
+  const goalsText = goals.length > 0
+    ? goals.map(g => `${g.name} (${g.progress}%): ${g.target}`).join('\n')
+    : `1. â¹100 Crore Wealth (target: â¹100Cr personal net worth)
+2. Empire (target: Master connector + ecosystem builder)
+3. Body & Attraction (target: Greek god physique + 50-partner pool)
+4. Influence (target: 1M+ followers â Malayalam first)
+5. Life & Clarity (target: Extraordinary life + relationship truth)`;
+
+  const winsText = recentWins.slice(0, 5).map(w => `- ${w.text}`).join('\n') || 'None yet';
+  const logsText = recentLogs.slice(0, 7).map(l =>
+    `Day ${l.day_number}: ${l.score}/${l.total_tasks} tasks, mood: ${l.mood || 'unknown'}`
+  ).join('\n') || 'No history yet';
+
+  const rev = metrics.rev || 400000;
+  const fol = metrics.fol || 157;
+  const debt = metrics.debt || 5000000;
+
+  return `You are Eby's personal Life OS AI coach. You have full context of his life and 500-day system.
+
+WHO IS EBY:
+34-year-old entrepreneur from Kochi, Kerala, India. Unmarried. Building his life across 5 goals simultaneously over 500 days starting March 2026.
+Businesses: Adivinar Catalyst IT Solutions (digital marketing, IT, AI automation, ~31 people, 50% owner) + Club Catalyst (resort management).
+BNI Warriors Kochi chapter â positioned as personal branding expert.
+
+CURRENT STATUS â Day ${dayNum} of 500:
+- Revenue: â¹${(rev/100000).toFixed(1)}L/month (target: â¹15L)
+- Followers: ${fol} (target: 1M+)
+- Debt: â¹${(debt/100000).toFixed(0)}L (URGENT â clear by Day 300, 60% of every rupee above â¹4L goes to debt)
+- Streak: ${streak} consecutive days
+- Today's mood: ${mood}
+- Today's situation: ${situation || 'not specified'}
+
+500-DAY GOALS:
+${goalsText}
+
+RECENT PROGRESS (last 7 days):
+${logsText}
+
+RECENT WINS:
+${winsText}
+
+THE 22 DAILY HABITS:
+Mind (Goal 5): Guided visualisation 10min | EFT 10min | Gratitude 3 things | Affirmations 5min | Read 5 pages
+Skills (Goal 4): English training 15min | Etiquette + world knowledge 1 thing | Style/fashion monthly
+Body (Goal 3): Workout any duration | Fight training (recreational, weekly) | Kaggle exercises (pelvic floor â code name, daily) | Supplements + diet | Skincare morning | Face exercise 5min
+Network (Goal 2): 10 reach-out messages | 1 genuine conversation | 1 BNI action
+Business (Goal 1): 1 Higgsfield content (Malayalam visual storytelling) | Club Catalyst 10 daily actions | 1 Adivinar process improved | 1 finance concept | Weekly review
+
+KEY CONTEXT:
+- Kaggle = pelvic floor exercise (private code name â never explain unless asked)
+- EFT = Emotional Freedom Technique for clearing limiting beliefs
+- Higgsfield = AI video tool for Malayalam content creation
+- Content strategy: Malayalam (Day 0-180) â Bilingual (Day 180-300) â English-led (Day 300+)
+- Travel: â¤â¹15K budget until debt cleared, every trip must feed 2+ goals
+- Partner pool: 50 people, grows from lifestyle naturally, no apps, no chasing
+- Identity: "I am the man people cannot categorise. I build empires quietly, live loudly."
+
+COACHING RULES (CRITICAL):
+- Be direct and short. Max 150 words unless deep review is explicitly requested.
+- Zero filler. No "great question!" No excessive praise. No "certainly!".
+- Any effort = a win. Visiting the gym counts. 2 pages counts. Always celebrate genuinely.
+- Never shame. Always redirect forward.
+- Low energy / rough day = minimum viable 3 actions only.
+- New goal mentioned = analyse against existing 5 goals, debt situation, Day ${dayNum} timing.
+- Celebrate wins by connecting to the specific 500-day goal.
+- Use live data (streak, revenue, followers) to personalise every response.
+- Everything connects back to the 500-day goals.`;
+}
