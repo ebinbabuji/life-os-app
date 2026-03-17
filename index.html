@@ -12,14 +12,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-/* ââ RESET ââ */
+/* ── RESET ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;background:#0a0a0a}
 body{font-family:'DM Sans',sans-serif;color:#e8e8e8;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
 button{font-family:'DM Sans',sans-serif;cursor:pointer}
 input,textarea{font-family:'DM Sans',sans-serif}
 
-/* ââ VARIABLES ââ */
+/* ── VARIABLES ── */
 :root{
   --bg:#0a0a0a;
   --card:#111111;
@@ -38,10 +38,10 @@ input,textarea{font-family:'DM Sans',sans-serif}
   --safe-bot:env(safe-area-inset-bottom,0px);
 }
 
-/* ââ APP SHELL ââ */
+/* ── APP SHELL ── */
 #app{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
 
-/* ââ HEADER ââ */
+/* ── HEADER ── */
 #hdr{
   display:flex;align-items:center;justify-content:space-between;
   padding:calc(var(--safe-top) + 14px) 20px 12px;
@@ -53,7 +53,7 @@ input,textarea{font-family:'DM Sans',sans-serif}
 .hdr-streak{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--t2)}
 .hdr-streak span:first-child{font-size:17px}
 
-/* ââ GOALS STRIP ââ */
+/* ── GOALS STRIP ── */
 #gstrip{
   display:flex;gap:0;padding:0 4px;background:var(--bg);
   border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;scrollbar-width:none;
@@ -67,7 +67,7 @@ input,textarea{font-family:'DM Sans',sans-serif}
 .gs-pct{font-size:10px;font-weight:500;position:relative;z-index:1}
 .gs-name{font-size:9px;color:var(--t2);text-align:center;line-height:1.2;letter-spacing:.2px}
 
-/* ââ SCREENS ââ */
+/* ── SCREENS ── */
 #screens{flex:1;overflow:hidden;position:relative}
 .screen{
   position:absolute;inset:0;overflow-y:auto;
@@ -77,7 +77,7 @@ input,textarea{font-family:'DM Sans',sans-serif}
 .screen::-webkit-scrollbar{display:none}
 .screen.active{display:block}
 
-/* ââ BOTTOM NAV ââ */
+/* ── BOTTOM NAV ── */
 #nav{
   display:flex;background:var(--bg);border-top:1px solid var(--border);
   padding-bottom:var(--safe-bot);flex-shrink:0;
@@ -91,18 +91,18 @@ input,textarea{font-family:'DM Sans',sans-serif}
 .nb.on{color:var(--text)}
 .nb-icon{font-size:19px;line-height:1}
 
-/* ââ SECTION HEADER ââ */
+/* ── SECTION HEADER ── */
 .sh{
   padding:14px 20px 7px;font-size:10px;font-weight:500;
   color:var(--t3);letter-spacing:1.8px;text-transform:uppercase;
 }
 
-/* ââ CARD ââ */
+/* ── CARD ── */
 .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin:0 16px 12px}
 .card-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;margin-bottom:3px}
 .card-sub{font-size:12px;color:var(--t2);margin-bottom:14px}
 
-/* ââ FORM ELEMENTS ââ */
+/* ── FORM ELEMENTS ── */
 .inp{
   width:100%;background:var(--elevated);border:1px solid var(--border);
   border-radius:10px;padding:11px 13px;color:var(--text);font-size:14px;outline:none;
@@ -114,7 +114,7 @@ textarea.inp{resize:none;line-height:1.55}
 .lbl{font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px}
 .frow{margin-bottom:12px}
 
-/* ââ BUTTONS ââ */
+/* ── BUTTONS ── */
 .btn-main{
   display:block;width:calc(100% - 32px);margin:0 16px 14px;
   padding:15px;background:var(--text);color:var(--bg);border:none;
@@ -133,8 +133,8 @@ textarea.inp{resize:none;line-height:1.55}
   font-size:13px;font-weight:500;color:#fff;
 }
 
-/* ââ TODAY: MOOD ââ */
-.iood-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;padding:0 16px;margin-bottom:12px}
+/* ── TODAY: MOOD ── */
+.mood-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;padding:0 16px;margin-bottom:12px}
 .mood-btn{
   display:flex;flex-direction:column;align-items:center;gap:5px;
   padding:11px 4px;background:var(--card);border:1.5px solid var(--border);
@@ -144,7 +144,7 @@ textarea.inp{resize:none;line-height:1.55}
 .mood-emoji{font-size:22px}
 .mood-btn.on{border-color:var(--g5);background:#1b1a0f;color:var(--g5)}
 
-/* ââ TODAY: PROGRESS ââ */
+/* ── TODAY: PROGRESS ── */
 .prog-wrap{padding:10px 16px 6px}
 .prog-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
 .prog-lbl{font-size:12px;color:var(--t2)}
@@ -152,7 +152,7 @@ textarea.inp{resize:none;line-height:1.55}
 .prog-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden}
 .prog-fill{height:100%;background:var(--text);border-radius:2px;transition:width .5s cubic-bezier(.4,0,.2,1)}
 
-/* ââ TODAY: TASKS ââ */
+/* ── TODAY: TASKS ── */
 .task-list{padding:0 16px}
 .task{
   display:flex;align-items:center;gap:11px;
@@ -174,18 +174,18 @@ textarea.inp{resize:none;line-height:1.55}
 .t-dur{font-size:10px;color:var(--t3)}
 .t-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
 
-/* ââ CUSTOM TASK ADD ââ */
+/* ── CUSTOM TASK ADD ── */
 .ct-row{display:flex;gap:8px;padding:0 16px;margin-bottom:12px}
 .ct-row input{flex:1}
 .ct-btn{padding:0 16px;background:var(--elevated);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:22px;line-height:1}
 
-/* ââ RESET DAY ââ */
+/* ── RESET DAY ── */
 .reset-row{
   padding:0 16px 8px;display:flex;justify-content:flex-end;
 }
 .reset-link{background:none;border:none;font-size:11px;color:var(--t3);text-decoration:underline;padding:4px 0}
 
-/* ââ GOALS SCREEN ââ */
+/* ── GOALS SCREEN ── */
 .goal-card{background:var(--card);border:1px solid var(--border);border-radius:16px;margin:0 16px 10px;overflow:hidden}
 .goal-top{display:flex;align-items:flex-start;gap:11px;padding:15px 17px;cursor:pointer}
 .goal-bar{width:3px;border-radius:2px;align-self:stretch;flex-shrink:0;min-height:36px}
@@ -198,13 +198,13 @@ textarea.inp{resize:none;line-height:1.55}
 .goal-edit{padding:14px 17px;border-top:1px solid var(--border);display:none}
 .goal-edit.open{display:block}
 
-/* ââ METRICS ââ */
+/* ── METRICS ── */
 .met-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
 .met-item{background:var(--elevated);border-radius:10px;padding:12px 8px;text-align:center}
 .met-val{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;line-height:1.2;margin-bottom:2px}
 .met-lbl{font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.6px}
 
-/* ââ LEARN SCREEN ââ */
+/* ── LEARN SCREEN ── */
 .lrn-card{background:var(--card);border:1px solid var(--border);border-radius:16px;margin:0 16px 10px;overflow:hidden}
 .lrn-hdr{display:flex;align-items:center;gap:11px;padding:14px 17px;cursor:pointer}
 .lrn-icon{font-size:21px}
@@ -222,14 +222,14 @@ textarea.inp{resize:none;line-height:1.55}
   border:1px solid var(--border2);border-radius:9px;color:var(--text);font-size:13px;text-align:center;
 }
 
-/* ââ COACH SCREEN ââ */
+/* ── COACH SCREEN ── */
 .warcry{font-family:'Cormorant Garamond',serif;font-size:19px;font-style:italic;line-height:1.6;margin-bottom:14px;min-height:56px;color:var(--text)}
 .aff-list{display:flex;flex-direction:column;gap:9px;margin-bottom:14px}
 .aff-item{display:flex;gap:9px;align-items:flex-start}
 .aff-dot{width:5px;height:5px;border-radius:50%;background:var(--g5);margin-top:7px;flex-shrink:0}
 .aff-text{font-size:13px;line-height:1.6}
 
-/* ââ CHAT ââ */
+/* ── CHAT ── */
 .chat-msgs{
   max-height:260px;overflow-y:auto;margin-bottom:12px;
   display:flex;flex-direction:column;gap:9px;scrollbar-width:none;
@@ -242,7 +242,7 @@ textarea.inp{resize:none;line-height:1.55}
 .chat-row input{flex:1}
 .btn-send{padding:10px 15px;background:var(--text);color:var(--bg);border:none;border-radius:10px;font-size:16px;font-weight:500}
 
-/* ââ WINS SCREEN ââ */
+/* ── WINS SCREEN ── */
 .win-input-wrap{padding:0 16px;margin-bottom:12px}
 .win-item{padding:13px 17px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin:0 16px 8px}
 .win-text{font-size:14px;line-height:1.45;margin-bottom:6px}
@@ -250,7 +250,7 @@ textarea.inp{resize:none;line-height:1.55}
 .win-day{font-size:11px;color:var(--t3)}
 .win-goal-tag{font-size:11px;font-weight:500}
 
-/* ââ LOADING ââ */
+/* ── LOADING ── */
 .dots{display:flex;gap:4px;align-items:center;justify-content:center;padding:16px}
 .dot{width:5px;height:5px;border-radius:50%;background:var(--t3);animation:dp 1.2s infinite}
 .dot:nth-child(2){animation-delay:.2s}
@@ -258,7 +258,7 @@ textarea.inp{resize:none;line-height:1.55}
 @keyframes dp{0%,60%,100%{opacity:.25;transform:scale(.75)}30%{opacity:1;transform:scale(1)}}
 .empty{text-align:center;padding:32px 20px;font-size:13px;color:var(--t3);font-style:italic;line-height:1.6}
 
-/* ââ CELEBRATION ââ */
+/* ── CELEBRATION ── */
 #cel{
   position:fixed;inset:0;z-index:900;display:none;
   align-items:center;justify-content:center;padding:40px;
@@ -276,7 +276,7 @@ textarea.inp{resize:none;line-height:1.55}
 .cel-msg{font-size:13px;color:var(--t2);line-height:1.65;margin-bottom:22px}
 .cel-btn{padding:12px 32px;background:var(--text);color:var(--bg);border:none;border-radius:10px;font-size:14px;font-weight:500}
 
-/* ââ TOAST ââ */
+/* ── TOAST ── */
 #toast{
   position:fixed;bottom:calc(var(--safe-bot) + 82px);left:50%;
   transform:translateX(-50%) translateY(12px);background:var(--text);color:var(--bg);
@@ -285,11 +285,31 @@ textarea.inp{resize:none;line-height:1.55}
 }
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* ââ STREAK MILESTONES ââ */
+/* ── STREAK MILESTONES ── */
 .streak-badge{
   display:inline-flex;align-items:center;gap:4px;padding:3px 8px;
   border-radius:20px;font-size:10px;font-weight:500;
 }
+
+/* ── CHARTS ── */
+.chart-section{margin-top:16px}
+.chart-block{background:var(--elevated);border-radius:12px;padding:14px;margin-bottom:10px;border:1px solid var(--border)}
+.chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.chart-label{font-size:12px;color:var(--t2);letter-spacing:.3px;text-transform:uppercase}
+.chart-current{font-size:15px;font-weight:500}
+.chart-trend{font-size:11px;font-weight:600;margin-top:4px}
+.chart-canvas{width:100%;height:60px;overflow:hidden}
+.chart-canvas svg{display:block;width:100%;height:60px}
+.chart-sub{font-size:10px;color:var(--t3);margin-top:6px}
+.chart-empty{font-size:12px;color:var(--t3);padding:20px 0;text-align:center}
+
+/* ── PWA INSTALL ── */
+#install-btn{
+  display:none;align-items:center;gap:5px;padding:5px 11px;
+  background:var(--elevated);border:1px solid var(--border2);border-radius:20px;
+  font-size:11px;color:var(--t2);cursor:pointer;transition:all .2s;
+}
+#install-btn:active{opacity:.7}
 </style>
 </head>
 <body>
@@ -299,11 +319,14 @@ textarea.inp{resize:none;line-height:1.55}
   <div id="hdr">
     <div class="hdr-left">
       <div class="hdr-day" id="hdr-day">Day 1</div>
-      <div class="hdr-sub" id="hdr-sub">499 days left Â· March 2026</div>
+      <div class="hdr-sub" id="hdr-sub">499 days left · March 2026</div>
     </div>
-    <div class="hdr-streak">
-      <span>ð¥</span>
-      <span id="hdr-streak-txt">0 day streak</span>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button id="install-btn" onclick="installApp()">📲 Add to Home</button>
+      <div class="hdr-streak">
+        <span>🔥</span>
+        <span id="hdr-streak-txt">0 day streak</span>
+      </div>
     </div>
   </div>
 
@@ -313,7 +336,7 @@ textarea.inp{resize:none;line-height:1.55}
   <!-- SCREENS -->
   <div id="screens">
 
-    <!-- ââ TODAY ââ -->
+    <!-- ══ TODAY ══ -->
     <div id="screen-today" class="screen active">
 
       <!-- Setup view (mood selector) -->
@@ -321,19 +344,19 @@ textarea.inp{resize:none;line-height:1.55}
         <div class="sh">Today's energy</div>
         <div class="mood-grid">
           <button class="mood-btn" data-mood="fired_up" onclick="pickMood(this)">
-            <span class="mood-emoji">ð¥</span>Fired Up
+            <span class="mood-emoji">🔥</span>Fired Up
           </button>
           <button class="mood-btn" data-mood="focused" onclick="pickMood(this)">
-            <span class="mood-emoji">ðª</span>Focused
+            <span class="mood-emoji">💪</span>Focused
           </button>
           <button class="mood-btn" data-mood="steady" onclick="pickMood(this)">
-            <span class="mood-emoji">ð</span>Steady
+            <span class="mood-emoji">😐</span>Steady
           </button>
           <button class="mood-btn" data-mood="tired" onclick="pickMood(this)">
-            <span class="mood-emoji">ð´</span>Tired
+            <span class="mood-emoji">😴</span>Tired
           </button>
           <button class="mood-btn" data-mood="rough" onclick="pickMood(this)">
-            <span class="mood-emoji">ð</span>Rough
+            <span class="mood-emoji">💀</span>Rough
           </button>
         </div>
         <div class="card" style="margin-bottom:12px">
@@ -353,7 +376,7 @@ textarea.inp{resize:none;line-height:1.55}
           <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
         </div>
         <div class="reset-row">
-          <button class="reset-link" onclick="resetDay()">âº new day setup</button>
+          <button class="reset-link" onclick="resetDay()">↺ new day setup</button>
         </div>
         <div id="task-list" class="task-list"></div>
         <div class="ct-row">
@@ -364,7 +387,7 @@ textarea.inp{resize:none;line-height:1.55}
 
     </div>
 
-    <!-- ââ GOALS ââ -->
+    <!-- ══ GOALS ══ -->
     <div id="screen-goals" class="screen">
       <div class="sh">Your 5 Goals</div>
       <div id="goals-list"></div>
@@ -373,7 +396,7 @@ textarea.inp{resize:none;line-height:1.55}
       <div class="card">
         <div class="met-grid" id="met-display"></div>
         <div class="frow">
-          <div class="lbl">Revenue / month (â¹)</div>
+          <div class="lbl">Revenue / month (₹)</div>
           <input type="number" class="inp" id="m-rev" placeholder="e.g. 400000">
         </div>
         <div class="frow">
@@ -381,25 +404,70 @@ textarea.inp{resize:none;line-height:1.55}
           <input type="number" class="inp" id="m-fol" placeholder="e.g. 157">
         </div>
         <div class="frow">
-          <div class="lbl">Debt remaining (â¹)</div>
+          <div class="lbl">Debt remaining (₹)</div>
           <input type="number" class="inp" id="m-debt" placeholder="e.g. 5000000">
         </div>
         <button class="btn-sm" onclick="saveMetrics()" style="width:100%;text-align:center;padding:11px">Save Numbers</button>
       </div>
+
+      <!-- CHARTS -->
+      <div class="chart-section">
+        <div class="sh" style="margin-top:6px">Trend Charts</div>
+
+        <div class="chart-block">
+          <div class="chart-header">
+            <span class="chart-label">Revenue / Month</span>
+            <span class="chart-current" style="color:var(--g1)" id="ct-rev">—</span>
+          </div>
+          <div class="chart-canvas" id="chart-rev"><div class="chart-empty">Log numbers to see trend</div></div>
+          <div class="chart-trend" id="ct-rev-trend"></div>
+          <div class="chart-sub">Target: ₹15L/month</div>
+        </div>
+
+        <div class="chart-block">
+          <div class="chart-header">
+            <span class="chart-label">Followers</span>
+            <span class="chart-current" style="color:var(--g4)" id="ct-fol">—</span>
+          </div>
+          <div class="chart-canvas" id="chart-fol"><div class="chart-empty">Log numbers to see trend</div></div>
+          <div class="chart-trend" id="ct-fol-trend"></div>
+          <div class="chart-sub">Target: 1M+ followers</div>
+        </div>
+
+        <div class="chart-block">
+          <div class="chart-header">
+            <span class="chart-label">Debt Remaining</span>
+            <span class="chart-current" style="color:var(--g3)" id="ct-debt">—</span>
+          </div>
+          <div class="chart-canvas" id="chart-debt"><div class="chart-empty">Log numbers to see trend</div></div>
+          <div class="chart-trend" id="ct-debt-trend"></div>
+          <div class="chart-sub">Clear by Day 300 · 60% above ₹4L → debt</div>
+        </div>
+
+        <div class="chart-block">
+          <div class="chart-header">
+            <span class="chart-label">Daily Completion</span>
+            <span class="chart-current" style="color:var(--g5)" id="ct-score">—</span>
+          </div>
+          <div class="chart-canvas" id="chart-score"><div class="chart-empty">Complete tasks to see trend</div></div>
+          <div class="chart-trend" id="ct-score-trend"></div>
+          <div class="chart-sub">Task completion % per day</div>
+        </div>
+      </div>
     </div>
 
-    <!-- ââ LEARN ââ -->
+    <!-- ══ LEARN ══ -->
     <div id="screen-learn" class="screen">
       <div class="sh">Daily Lessons</div>
 
       <div class="lrn-card">
         <div class="lrn-hdr" onclick="toggleLearn('en')">
-          <span class="lrn-icon">ð£ï¸</span>
+          <span class="lrn-icon">🗣️</span>
           <div class="lrn-hdr-text">
             <div class="lrn-title">English Training</div>
             <div class="lrn-sub">Word, phrase, or grammar tip</div>
           </div>
-          <span class="lrn-arrow" id="la-en">â¶</span>
+          <span class="lrn-arrow" id="la-en">▶</span>
         </div>
         <div class="lrn-body" id="lb-en">
           <div class="lrn-empty" id="lp-en">Tap to generate today's English lesson</div>
@@ -410,12 +478,12 @@ textarea.inp{resize:none;line-height:1.55}
 
       <div class="lrn-card">
         <div class="lrn-hdr" onclick="toggleLearn('etq')">
-          <span class="lrn-icon">ð©</span>
+          <span class="lrn-icon">🎩</span>
           <div class="lrn-hdr-text">
             <div class="lrn-title">Etiquette + World</div>
             <div class="lrn-sub">Sophistication & global intelligence</div>
           </div>
-          <span class="lrn-arrow" id="la-etq">â¶</span>
+          <span class="lrn-arrow" id="la-etq">▶</span>
         </div>
         <div class="lrn-body" id="lb-etq">
           <div class="lrn-empty" id="lp-etq">Tap to generate today's etiquette tip</div>
@@ -426,12 +494,12 @@ textarea.inp{resize:none;line-height:1.55}
 
       <div class="lrn-card">
         <div class="lrn-hdr" onclick="toggleLearn('fin')">
-          <span class="lrn-icon">ð</span>
+          <span class="lrn-icon">📈</span>
           <div class="lrn-hdr-text">
             <div class="lrn-title">Finance 1%</div>
             <div class="lrn-sub">One wealth concept daily</div>
           </div>
-          <span class="lrn-arrow" id="la-fin">â¶</span>
+          <span class="lrn-arrow" id="la-fin">▶</span>
         </div>
         <div class="lrn-body" id="lb-fin">
           <div class="lrn-empty" id="lp-fin">Tap to generate today's finance concept</div>
@@ -442,12 +510,12 @@ textarea.inp{resize:none;line-height:1.55}
 
       <div class="lrn-card">
         <div class="lrn-hdr" onclick="toggleLearn('sty')">
-          <span class="lrn-icon">ð</span>
+          <span class="lrn-icon">👔</span>
           <div class="lrn-hdr-text">
             <div class="lrn-title">Style + Fashion</div>
             <div class="lrn-sub">Presence & attraction upgrade</div>
           </div>
-          <span class="lrn-arrow" id="la-sty">â¶</span>
+          <span class="lrn-arrow" id="la-sty">▶</span>
         </div>
         <div class="lrn-body" id="lb-sty">
           <div class="lrn-empty" id="lp-sty">Tap to generate today's style tip</div>
@@ -457,13 +525,13 @@ textarea.inp{resize:none;line-height:1.55}
       </div>
     </div>
 
-    <!-- ââ COACH ââ -->
+    <!-- ══ COACH ══ -->
     <div id="screen-coach" class="screen">
 
       <div class="sh">Morning War Cry</div>
       <div class="card">
         <div class="warcry" id="warcry-txt">Your battle cry for today. Tap generate.</div>
-        <button class="btn-gen" id="warcry-btn" onclick="genWarCry()">â¡ Generate War Cry</button>
+        <button class="btn-gen" id="warcry-btn" onclick="genWarCry()">⚡ Generate War Cry</button>
       </div>
 
       <div class="sh">Identity Affirmations</div>
@@ -477,23 +545,23 @@ textarea.inp{resize:none;line-height:1.55}
       <div class="sh">Coach Conversation</div>
       <div class="card">
         <div class="chat-msgs" id="chat-msgs">
-          <div class="msg a">Ready. Tell me what's on your mind â or where you need direction today.</div>
+          <div class="msg a">Ready. Tell me what's on your mind — or where you need direction today.</div>
         </div>
         <div class="chat-row">
           <input type="text" class="inp" id="chat-inp" placeholder="Ask your coach..." onkeydown="if(event.key==='Enter')sendMsg()">
-          <button class="btn-send" onclick="sendMsg()">â</button>
+          <button class="btn-send" onclick="sendMsg()">→</button>
         </div>
       </div>
 
     </div>
 
-    <!-- ââ WINS ââ -->
+    <!-- ══ WINS ══ -->
     <div id="screen-wins" class="screen">
       <div class="sh">Log a Win</div>
       <div class="win-input-wrap">
-        <textarea class="inp" id="win-inp" rows="3" placeholder="What did you do today? Any effort counts â visiting the gym counts, 2 pages counts..."></textarea>
+        <textarea class="inp" id="win-inp" rows="3" placeholder="What did you do today? Any effort counts — visiting the gym counts, 2 pages counts..."></textarea>
       </div>
-      <button class="btn-main" id="log-btn" onclick="logWin()">Log This Win â­</button>
+      <button class="btn-main" id="log-btn" onclick="logWin()">Log This Win ⭐</button>
 
       <div class="sh">Win History</div>
       <div id="wins-list">
@@ -505,11 +573,11 @@ textarea.inp{resize:none;line-height:1.55}
 
   <!-- BOTTOM NAV -->
   <nav id="nav">
-    <button class="nb on" onclick="goTo('today',this)"><span class="nb-icon">âï¸</span>Today</button>
-    <button class="nb" onclick="goTo('goals',this)"><span class="nb-icon">ð¯</span>Goals</button>
-    <button class="nb" onclick="goTo('learn',this)"><span class="nb-icon">ð</span>Learn</button>
-    <button class="nb" onclick="goTo('coach',this)"><span class="nb-icon">ð§ </span>Coach</button>
-    <button class="nb" onclick="goTo('wins',this)"><span class="nb-icon">â­</span>Wins</button>
+    <button class="nb on" onclick="goTo('today',this)"><span class="nb-icon">☀️</span>Today</button>
+    <button class="nb" onclick="goTo('goals',this)"><span class="nb-icon">🎯</span>Goals</button>
+    <button class="nb" onclick="goTo('learn',this)"><span class="nb-icon">📖</span>Learn</button>
+    <button class="nb" onclick="goTo('coach',this)"><span class="nb-icon">🧠</span>Coach</button>
+    <button class="nb" onclick="goTo('wins',this)"><span class="nb-icon">⭐</span>Wins</button>
   </nav>
 
 </div><!-- /app -->
@@ -518,27 +586,27 @@ textarea.inp{resize:none;line-height:1.55}
 <div id="cel">
   <div class="cel-bg" onclick="closeCel()"></div>
   <div class="cel-box">
-    <div class="cel-emoji" id="cel-emoji">ð</div>
+    <div class="cel-emoji" id="cel-emoji">🎉</div>
     <div class="cel-title" id="cel-title">Win!</div>
     <div class="cel-msg" id="cel-msg"></div>
-    <button class="cel-btn" onclick="closeCel()">Keep Going â</button>
+    <button class="cel-btn" onclick="closeCel()">Keep Going →</button>
   </div>
 </div>
 
 <div id="toast"></div>
 
 <script>
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // CONFIG
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 const SURL = 'https://fsxhcflzpztnzesukjia.supabase.co';
 const SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZzeGhjZmx6cHp0bnplc3VramlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjI2OTMsImV4cCI6MjA4OTIzODY5M30.HOXnI3WRBBdvKV37sTM1fs8FeRS2SAkCD2vyyC36xPE';
 const GC = ['#4caf7d','#5b9bd5','#d4845a','#9b7fd4','#c9a84c'];
 const GN = ['Wealth','Empire','Body','Influence','Life'];
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // STATE
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 const S = {
   db: null,
   dayNum: 1,
@@ -552,12 +620,15 @@ const S = {
   totalWins: 0,
   settings: {},
   chatHist: [],
-  cel: { first: false, half: false, all: false }
+  cel: { first: false, half: false, all: false },
+  metricsHistory: [],
+  recentLogs: [],
+  recentWins: []
 };
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // INIT
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 async function init() {
   S.db = supabase.createClient(SURL, SKEY);
   await Promise.all([loadSettings(), loadGoals(), loadMetrics()]);
@@ -567,11 +638,23 @@ async function init() {
   await loadTodayLog();
   updateHeader();
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
+
+  // PWA install prompt
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    S._installPrompt = e;
+    document.getElementById('install-btn').style.display = 'flex';
+  });
+  window.addEventListener('appinstalled', () => {
+    document.getElementById('install-btn').style.display = 'none';
+    S._installPrompt = null;
+    showToast('Life OS added to home screen ✓');
+  });
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // SUPABASE
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 async function loadSettings() {
   const { data } = await S.db.from('settings').select('*').eq('id', 1).single();
   if (!data) return;
@@ -584,14 +667,144 @@ async function loadSettings() {
   S.dayNum = Math.max(1, Math.floor((now - start) / 86400000) + 1);
 }
 
-arync function loadGoals() {
+async function loadGoals() {
   const { data } = await S.db.from('goals').select('*').order('id');
   if (data && data.length) S.goals = data;
 }
 
-arync function loadMetrics() {
+async function loadMetrics() {
   const { data } = await S.db.from('metrics').select('*').order('metric_date',{ascending:false}).limit(1);
   if (data && data.length) S.metrics = { rev: data[0].revenue, fol: data[0].followers, debt: data[0].debt };
+}
+
+// ═══════════════════════════════════════════════════════
+// CHARTS
+// ═══════════════════════════════════════════════════════
+async function loadAndRenderCharts() {
+  // Load metrics history (last 30 days)
+  const { data: mData } = await S.db.from('metrics')
+    .select('metric_date, revenue, followers, debt')
+    .order('metric_date', { ascending: true })
+    .limit(30);
+  S.metricsHistory = mData || [];
+
+  // Load daily completion history (last 30 days)
+  const { data: lData } = await S.db.from('daily_logs')
+    .select('log_date, score, total_tasks')
+    .order('log_date', { ascending: true })
+    .limit(30);
+
+  const fmt = n => n >= 10000000 ? '₹'+(n/10000000).toFixed(1)+'Cr' :
+                   n >= 100000  ? '₹'+(n/100000).toFixed(1)+'L' :
+                   n >= 1000    ? '₹'+(n/1000).toFixed(0)+'K' : '₹'+n;
+
+  if (S.metricsHistory.length >= 1) {
+    const revs  = S.metricsHistory.map(d => d.revenue);
+    const fols  = S.metricsHistory.map(d => d.followers);
+    const debts = S.metricsHistory.map(d => d.debt);
+    const last  = S.metricsHistory[S.metricsHistory.length - 1];
+
+    document.getElementById('ct-rev').textContent  = fmt(last.revenue);
+    document.getElementById('ct-fol').textContent  = last.followers.toLocaleString('en-IN');
+    document.getElementById('ct-debt').textContent = fmt(last.debt);
+
+    if (S.metricsHistory.length >= 2) {
+      renderSparkline('chart-rev',  revs,  '#4caf7d', false, 'ct-rev-trend',  false);
+      renderSparkline('chart-fol',  fols,  '#9b7fd4', false, 'ct-fol-trend',  false);
+      renderSparkline('chart-debt', debts, '#d4845a', false, 'ct-debt-trend', true);  // lower = better
+    }
+  }
+
+  if (lData && lData.length >= 1) {
+    const scores = lData.map(d => d.total_tasks > 0 ? Math.round((d.score / d.total_tasks) * 100) : 0);
+    const avgScore = Math.round(scores.reduce((a,b) => a+b, 0) / scores.length);
+    document.getElementById('ct-score').textContent = avgScore + '% avg';
+    if (lData.length >= 2) {
+      renderSparkline('chart-score', scores, '#c9a84c', false, 'ct-score-trend', false);
+    }
+  }
+}
+
+function renderSparkline(containerId, data, color, gradient, trendId, lowerIsBetter) {
+  const el = document.getElementById(containerId);
+  if (!el || data.length < 2) return;
+
+  const w = 300, h = 60, pad = 4;
+  const min = Math.min(...data), max = Math.max(...data);
+  const range = max - min || 1;
+
+  const pts = data.map((v, i) => {
+    const x = pad + (i / (data.length - 1)) * (w - pad * 2);
+    const y = h - pad - ((v - min) / range) * (h - pad * 2);
+    return [x, y];
+  });
+
+  const last = data[data.length - 1];
+  const prev = data[data.length - 2];
+  const rising = last > prev;
+  const same = last === prev;
+  const isGood = lowerIsBetter ? !rising : rising;
+  const trendColor = same ? 'var(--t3)' : (isGood ? 'var(--g1)' : 'var(--g3)');
+  const trendSymbol = same ? '→ no change' : (rising ? '↑ rising' : '↓ falling');
+
+  const polyPts = pts.map(p => p.join(',')).join(' ');
+  // area fill path
+  const areaD = `M${pts[0][0]},${h} ` + pts.map(p => `L${p[0]},${p[1]}`).join(' ') + ` L${pts[pts.length-1][0]},${h} Z`;
+  const lastPt = pts[pts.length - 1];
+
+  el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="grad-${containerId}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${color}" stop-opacity="0.2"/>
+        <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <path d="${areaD}" fill="url(#grad-${containerId})"/>
+    <polyline points="${polyPts}" fill="none" stroke="${color}" stroke-width="1.8"
+      stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${lastPt[0]}" cy="${lastPt[1]}" r="3.5" fill="${color}"/>
+  </svg>`;
+
+  if (trendId) {
+    const tEl = document.getElementById(trendId);
+    if (tEl) { tEl.textContent = trendSymbol; tEl.style.color = trendColor; }
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// COACH MEMORY — load recent context
+// ═══════════════════════════════════════════════════════
+async function loadRecentContext() {
+  const [logsRes, winsRes] = await Promise.all([
+    S.db.from('daily_logs')
+      .select('day_number, score, total_tasks, mood, log_date')
+      .order('log_date', { ascending: false })
+      .limit(7),
+    S.db.from('wins')
+      .select('text, day_number')
+      .order('created_at', { ascending: false })
+      .limit(5)
+  ]);
+  S.recentLogs  = logsRes.data  || [];
+  S.recentWins  = winsRes.data  || [];
+}
+
+// ═══════════════════════════════════════════════════════
+// PWA INSTALL
+// ═══════════════════════════════════════════════════════
+async function installApp() {
+  if (S._installPrompt) {
+    S._installPrompt.prompt();
+    const { outcome } = await S._installPrompt.userChoice;
+    if (outcome === 'accepted') {
+      document.getElementById('install-btn').style.display = 'none';
+    }
+    S._installPrompt = null;
+  } else {
+    // iOS fallback — no beforeinstallprompt on Safari
+    cel('📲', 'Add to Home Screen',
+      'On iPhone: tap the Share button (□↑) at the bottom of Safari, then choose "Add to Home Screen".');
+  }
 }
 
 async function loadTodayLog() {
@@ -634,39 +847,40 @@ async function saveLog() {
       streak: newStreak, last_active_date: today(), updated_at: new Date().toISOString()
     }).eq('id', 1);
     // streak milestone celebrations
-    if (newStreak === 3) cel('ð¥','3-Day Streak!','Three in a row. The habit is forming. Keep the chain alive.');
-    else if (newStreak === 7) cel('â¡','7-Day Streak!','One full week straight. Most people quit before this. You didn\'t.');
-    else if (newStreak === 30) cel('ð','30-Day Streak!','Thirty consecutive days. You\'re genuinely not the same person who started this.');
+    if (newStreak === 3) cel('🔥','3-Day Streak!','Three in a row. The habit is forming. Keep the chain alive.');
+    else if (newStreak === 7) cel('⚡','7-Day Streak!','One full week straight. Most people quit before this. You didn\'t.');
+    else if (newStreak === 30) cel('👑','30-Day Streak!','Thirty consecutive days. You\'re genuinely not the same person who started this.');
     updateHeader();
   }
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // NAVIGATION
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 function goTo(name, btn) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nb').forEach(b => b.classList.remove('on'));
   document.getElementById('screen-' + name).classList.add('active');
   btn.classList.add('on');
   if (name === 'wins') loadWins();
+  if (name === 'goals') loadAndRenderCharts();
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // HEADER
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 function updateHeader() {
   document.getElementById('hdr-day').textContent = 'Day ' + S.dayNum;
   const left = Math.max(0, 500 - S.dayNum);
   const dateStr = new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
-  document.getElementById('hdr-sub').textContent = left + ' days left Â· ' + dateStr;
+  document.getElementById('hdr-sub').textContent = left + ' days left · ' + dateStr;
   const s = S.streak;
   document.getElementById('hdr-streak-txt').textContent = s + (s === 1 ? ' day' : ' day') + ' streak';
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // GOALS STRIP
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 function renderStrip() {
   const goals = S.goals.length ? S.goals : GN.map((n,i) => ({ id:i+1, name:n, progress:1 }));
   document.getElementById('gstrip').innerHTML = goals.map((g, i) => {
@@ -686,9 +900,9 @@ function renderStrip() {
   }).join('');
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-// TODAY â MOOD
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
+// TODAY — MOOD
+// ═══════════════════════════════════════════════════════
 function pickMood(btn) {
   document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
@@ -696,9 +910,9 @@ function pickMood(btn) {
   document.getElementById('build-btn').disabled = false;
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-// TODAY â BUILD DAY (AI task generation)
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
+// TODAY — BUILD DAY (AI task generation)
+// ═══════════════════════════════════════════════════════
 async function buildDay() {
   const btn = document.getElementById('build-btn');
   const sit = document.getElementById('sit-input').value.trim();
@@ -710,7 +924,7 @@ async function buildDay() {
   const prompt = `Generate a personalised daily task list for Eby on Day ${S.dayNum} of his 500-day system.
 Mood: ${S.mood}${sit ? '\nSituation: ' + sit : ''}
 
-Return ONLY valid JSON array â `nomarkdown, no extra text, no code block.
+Return ONLY valid JSON array — no markdown, no extra text, no code block.
 Exactly ${n} tasks. Each task:
 {
   "id": "t1" (unique, sequential),
@@ -729,7 +943,7 @@ NETWORK (goal 2): Send 10 reach-out messages | 1 genuine conversation | 1 BNI ac
 BUSINESS (goal 1): Post Higgsfield content | Club Catalyst 10 actions | Improve Adivinar process | Finance concept | Weekly review
 
 For "${S.mood}" day, weight tasks accordingly.
-Mark exactly 3 tasks min_viable:true â the three smallest, fastest actions.`;
+Mark exactly 3 tasks min_viable:true — the three smallest, fastest actions.`;
 
   try {
     const res = await ai(prompt, {}, 1500);
@@ -789,7 +1003,7 @@ function renderTasks() {
     const done = S.done.has(t.id);
     const color = GC[(t.goal_id||1)-1] || '#888';
     return `<div class="task ${done?'done':''}" id="tk-${t.id}" onclick="toggleTask('${t.id}')">
-      <div class="t-check">${done?'â':''}</div>
+      <div class="t-check">${done?'✓':''}</div>
       <div class="t-body">
         <div class="t-title">${t.title}</div>
         <div class="t-meta">
@@ -811,19 +1025,19 @@ async function toggleTask(id) {
     const total = all.length, done = S.done.size;
     if (!S.cel.first && done === 1) {
       S.cel.first = true;
-      cel('ð¥','First one down!','The machine is moving. That\'s all it takes â one action to break inertia.');
+      cel('🔥','First one down!','The machine is moving. That\'s all it takes — one action to break inertia.');
     } else if (!S.cel.half && total > 1 && done >= Math.floor(total/2)) {
       S.cel.half = true;
-      cel('â¡','Halfway there!',`${done} done. You pushed through the middle â momentum belongs to you now.`);
+      cel('⚡','Halfway there!',`${done} done. You pushed through the middle — momentum belongs to you now.`);
     } else if (!S.cel.all && done === total && total > 0) {
       S.cel.all = true;
-      cel('ð','Day complete!',`${total}/${total}. Day ${S.dayNum} of 500 â fully done. This is exactly how empires are built.`);
+      cel('👑','Day complete!',`${total}/${total}. Day ${S.dayNum} of 500 — fully done. This is exactly how empires are built.`);
     }
   }
   const el = document.getElementById('tk-'+id);
   if (el) {
     el.classList.toggle('done', S.done.has(id));
-    el.querySelector('.t-check').textContent = S.done.has(id) ? 'â' : '';
+    el.querySelector('.t-check').textContent = S.done.has(id) ? '✓' : '';
   }
   updateProg();
   await saveLog();
@@ -860,12 +1074,12 @@ function resetDay() {
   }
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // GOALS SCREEN
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 function renderGoalsList() {
   const goals = S.goals.length ? S.goals : GN.map((n,i) => ({
-    id:i+1, name:n, target:['â¹100Cr personal net worth','Master connector + ecosystem builder','Greek god physique + 50-partner pool','1M+ followers â Malayalam first','Extraordinary life + relationship truth'][i], progress:1
+    id:i+1, name:n, target:['₹100Cr personal net worth','Master connector + ecosystem builder','Greek god physique + 50-partner pool','1M+ followers — Malayalam first','Extraordinary life + relationship truth'][i], progress:1
   }));
   document.getElementById('goals-list').innerHTML = goals.map((g, i) => {
     const c = GC[i], p = g.progress || 0;
@@ -906,13 +1120,13 @@ async function saveGoal(id) {
   if (g) { g.progress = p; g.target = t; }
   renderGoalsList(); renderStrip();
   document.getElementById('ge-'+id).classList.remove('open');
-  showToast('Goal updated â');
+  showToast('Goal updated ✓');
 }
 
 function renderMetrics() {
-  const fmt = n => n >= 10000000 ? 'â¹'+(n/10000000).toFixed(1)+'Cr' :
-                   n >= 100000  ? 'â¹'+(n/100000).toFixed(1)+'L' :
-                   n >= 1000    ? 'â¹'+(n/1000).toFixed(0)+'K' : 'â¹'+n;
+  const fmt = n => n >= 10000000 ? '₹'+(n/10000000).toFixed(1)+'Cr' :
+                   n >= 100000  ? '₹'+(n/100000).toFixed(1)+'L' :
+                   n >= 1000    ? '₹'+(n/1000).toFixed(0)+'K' : '₹'+n;
   document.getElementById('met-display').innerHTML = `
     <div class="met-item">
       <div class="met-val" style="color:var(--g1)">${fmt(S.metrics.rev)}</div>
@@ -938,18 +1152,19 @@ async function saveMetrics() {
   S.metrics = { rev, fol, debt };
   await S.db.from('metrics').upsert({ metric_date:today(), revenue:rev, followers:fol, debt }, { onConflict:'metric_date' });
   renderMetrics();
-  showToast('Numbers saved â');
+  loadAndRenderCharts();
+  showToast('Numbers saved ✓');
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // LEARN SCREEN
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 function toggleLearn(key) {
   const body = document.getElementById('lb-'+key);
   const arrow = document.getElementById('la-'+key);
   body.classList.toggle('open');
   arrow.classList.toggle('open');
-  arrow.textContent = body.classList.contains('open') ? 'â¼' : 'â¶';
+  arrow.textContent = body.classList.contains('open') ? '▼' : '▶';
 }
 
 function learnPrompt(key) {
@@ -964,32 +1179,32 @@ MEANING: [clear definition, 1 sentence]
 EXAMPLE: [natural business or leadership example sentence]
 PRO TIP: [one tip on using it naturally in conversation or content]
 
-Choose something useful for an entrepreneur doing international business. Not textbook â real world.`;
+Choose something useful for an entrepreneur doing international business. Not textbook — real world.`;
 
   if (key === 'etq') return `Give Eby one sophisticated etiquette or world knowledge tip. He is building a top 1% life from Kochi, Kerala. Day ${day} of 500.
 
 Format exactly:
 TIP: [the specific tip, bold and actionable]
-WHY IT MATTERS: [2 sentences â how this elevates his status or relationships]
-IN PRACTICE: [specific scenario where Eby applies this â make it Kerala/India-relevant where possible]
+WHY IT MATTERS: [2 sentences — how this elevates his status or relationships]
+IN PRACTICE: [specific scenario where Eby applies this — make it Kerala/India-relevant where possible]
 
 Choose from: dining etiquette, global customs, conversation mastery, body language, hospitality, cultural intelligence, travel sophistication.`;
 
-  if (key === 'fin') return `Give Eby one wealth-building or finance concept. Context: â¹${debt}L debt (clearing by Day 300), building toward â¹100Cr net worth. Currently earning â¹${rev}L/month. Day ${day} of 500.
+  if (key === 'fin') return `Give Eby one wealth-building or finance concept. Context: ₹${debt}L debt (clearing by Day 300), building toward ₹100Cr net worth. Currently earning ₹${rev}L/month. Day ${day} of 500.
 
 Format exactly:
 CONCEPT: [name]
 WHAT IT IS: [2-sentence explanation, no jargon]
-HOW IT APPLIES TO EBY: [specific to his situation â debt payoff, Adivinar revenue, Club Catalyst, investing]
+HOW IT APPLIES TO EBY: [specific to his situation — debt payoff, Adivinar revenue, Club Catalyst, investing]
 THIS WEEK: [one concrete action he can take this week based on this concept]`;
 
-  if (key === 'sty') return `Give Eby one specific style or presence upgrade tip. He is building a Greek god physique + commanding, magnetic presence â a bad-boy-doing-good entrepreneur from Kochi. Day ${day} of 500.
+  if (key === 'sty') return `Give Eby one specific style or presence upgrade tip. He is building a Greek god physique + commanding, magnetic presence — a bad-boy-doing-good entrepreneur from Kochi. Day ${day} of 500.
 
 Format exactly:
 TIP: [the specific, actionable tip]
-WHY: [1 sentence â how this creates attraction or authority]
+WHY: [1 sentence — how this creates attraction or authority]
 TODAY: [exactly how he applies or thinks about this today]
-INVEST: [one thing worth spending on this month related to this â give a specific product or category]`;
+INVEST: [one thing worth spending on this month related to this — give a specific product or category]`;
   return `Give a useful daily tip for Day ${day}.`;
 }
 
@@ -1006,23 +1221,23 @@ async function genLesson(key, btn) {
   } catch (e) {
     content.textContent = 'Failed to generate. Tap to retry.';
   }
-  btn.textContent = 'âº Regenerate'; btn.disabled = false;
+  btn.textContent = '↺ Regenerate'; btn.disabled = false;
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // COACH SCREEN
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 async function genWarCry() {
   const btn = document.getElementById('warcry-btn');
   const display = document.getElementById('warcry-txt');
   btn.disabled = true; btn.textContent = 'Channeling...';
   display.innerHTML = '<div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
   const prompt = `Write Eby's personal battle cry for Day ${S.dayNum} of 500.
-He started with â¹50L debt, from Kochi, Kerala. Building to â¹100Cr, 1M followers, Greek physique, an empire. Streak: ${S.streak} days.
+He started with ₹50L debt, from Kochi, Kerala. Building to ₹100Cr, 1M followers, Greek physique, an empire. Streak: ${S.streak} days.
 
 Rules:
 - 2-4 sentences, first person ("I am..." / "I will..." / "Today...")
-- Raw, emotional, bold â not corporate motivational-poster
+- Raw, emotional, bold — not corporate motivational-poster
 - Reference something specific: the debt origin, Day ${S.dayNum} of 500, the comeback arc, Kerala
 - Reads like a man who has everything to build and nothing to lose
 - No hashtags, no emojis`;
@@ -1030,9 +1245,9 @@ Rules:
     const res = await ai(prompt, { dayNum:S.dayNum, streak:S.streak, metrics:S.metrics }, 400);
     display.textContent = res;
   } catch (e) {
-    display.textContent = 'Something went wrong. You already know what to do â go.';
+    display.textContent = 'Something went wrong. You already know what to do — go.';
   }
-  btn.textContent = 'âº Regenerate'; btn.disabled = false;
+  btn.textContent = '↺ Regenerate'; btn.disabled = false;
 }
 
 async function genAffirmations() {
@@ -1041,13 +1256,13 @@ async function genAffirmations() {
   btn.disabled = true; btn.textContent = 'Generating...';
   list.innerHTML = '<div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
   const prompt = `Generate 5 identity affirmations for Eby on Day ${S.dayNum} of 500.
-Identity: Kochi entrepreneur, â¹${(S.metrics.rev/100000).toFixed(1)}L/month revenue, ${S.metrics.fol} followers, â¹${(S.metrics.debt/100000).toFixed(0)}L debt being cleared.
-Building: â¹100Cr wealth, Greek physique, 1M followers, empire network.
+Identity: Kochi entrepreneur, ₹${(S.metrics.rev/100000).toFixed(1)}L/month revenue, ${S.metrics.fol} followers, ₹${(S.metrics.debt/100000).toFixed(0)}L debt being cleared.
+Building: ₹100Cr wealth, Greek physique, 1M followers, empire network.
 
 Rules:
-- Present tense identity ONLY ("I am..." "I have..." "I attract...") â never future tense
+- Present tense identity ONLY ("I am..." "I have..." "I attract...") — never future tense
 - 1 sentence each, punchy
-- Specific to his actual life â wealth, body, influence, Kochi, the journey
+- Specific to his actual life — wealth, body, influence, Kochi, the journey
 - Sound real and earned, not generic
 Return exactly 5 affirmations, one per line, no numbers, no quotes, no extra text.`;
   try {
@@ -1057,7 +1272,7 @@ Return exactly 5 affirmations, one per line, no numbers, no quotes, no extra tex
   } catch (e) {
     list.innerHTML = '<div class="empty">Failed to generate. Try again.</div>';
   }
-  btn.textContent = 'âº Regenerate'; btn.disabled = false;
+  btn.textContent = '↺ Regenerate'; btn.disabled = false;
 }
 
 async function sendMsg() {
@@ -1072,9 +1287,12 @@ async function sendMsg() {
   msgs.innerHTML += `<div class="msg a" id="${lid}"><div class="dots" style="padding:4px 0"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
   msgs.scrollTop = msgs.scrollHeight;
   try {
+    // Load recent history for richer context
+    await loadRecentContext();
     const res = await ai(txt, {
       dayNum:S.dayNum, mood:S.mood, streak:S.streak,
       goals:S.goals, metrics:S.metrics,
+      recentLogs:S.recentLogs, recentWins:S.recentWins,
       situation:document.getElementById('sit-input')?.value||''
     }, 1000, S.chatHist.slice(-8));
     document.getElementById(lid).textContent = res;
@@ -1085,9 +1303,9 @@ async function sendMsg() {
   msgs.scrollTop = msgs.scrollHeight;
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // WINS SCREEN
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 async function logWin() {
   const inp = document.getElementById('win-inp');
   const txt = inp.value.trim();
@@ -1107,12 +1325,12 @@ Max 60 words total.`;
     S.totalWins++;
     await S.db.from('settings').update({ total_wins:S.totalWins }).eq('id',1);
     inp.value = '';
-    if (S.totalWins === 10) cel('ð','10 Wins Logged!','Ten recorded. The evidence file of your empire is growing. Every win here is proof that you showed up.');
-    else if (S.totalWins === 50) cel('ð¥','50 Wins!','Fifty moments of action in the log. This is not a hobby anymore. This is a system. Keep going.');
-    else cel('â­','Win logged.', aiReply);
+    if (S.totalWins === 10) cel('🏆','10 Wins Logged!','Ten recorded. The evidence file of your empire is growing. Every win here is proof that you showed up.');
+    else if (S.totalWins === 50) cel('🔥','50 Wins!','Fifty moments of action in the log. This is not a hobby anymore. This is a system. Keep going.');
+    else cel('⭐','Win logged.', aiReply);
     loadWins();
-  } catch (e) { showToast('Failed to log win â try again'); }
-  btn.disabled = false; btn.textContent = 'Log This Win â­';
+  } catch (e) { showToast('Failed to log win — try again'); }
+  btn.disabled = false; btn.textContent = 'Log This Win ⭐';
 }
 
 async function loadWins() {
@@ -1120,7 +1338,7 @@ async function loadWins() {
   el.innerHTML = '<div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
   const { data } = await S.db.from('wins').select('*').order('created_at',{ascending:false}).limit(50);
   if (!data || !data.length) {
-    el.innerHTML = '<div class="empty">No wins logged yet.<br>Every action counts â log your first one above.</div>';
+    el.innerHTML = '<div class="empty">No wins logged yet.<br>Every action counts — log your first one above.</div>';
     return;
   }
   el.innerHTML = data.map(w => {
@@ -1129,16 +1347,16 @@ async function loadWins() {
     return `<div class="win-item">
       <div class="win-text">${w.text}</div>
       <div class="win-footer">
-        <span class="win-day">Day ${w.day_number||'?'} Â· ${fmtDate(w.win_date)}</span>
+        <span class="win-day">Day ${w.day_number||'?'} · ${fmtDate(w.win_date)}</span>
         ${gn ? `<span class="win-goal-tag" style="color:${c}">${gn}</span>` : ''}
       </div>
     </div>`;
   }).join('');
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // AI HELPER
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 async function ai(message, context = {}, maxTokens = 800, history = []) {
   const r = await fetch('/.netlify/functions/chat', {
     method:'POST',
@@ -1155,9 +1373,9 @@ async function ai(message, context = {}, maxTokens = 800, history = []) {
   return d.reply;
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // CELEBRATION
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 function cel(emoji, title, msg) {
   document.getElementById('cel-emoji').textContent = emoji;
   document.getElementById('cel-title').textContent = title;
@@ -1166,27 +1384,27 @@ function cel(emoji, title, msg) {
 }
 function closeCel() { document.getElementById('cel').classList.remove('show'); }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // TOAST
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2200);
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // UTILS
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 function today() { return new Date().toISOString().split('T')[0]; }
 function fmtDate(d) {
   if (!d) return '';
   return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short'});
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // START
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 init();
 </script>
 </body>
