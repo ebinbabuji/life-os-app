@@ -310,6 +310,46 @@ textarea.inp{resize:none;line-height:1.55}
   font-size:11px;color:var(--t2);cursor:pointer;transition:all .2s;
 }
 #install-btn:active{opacity:.7}
+
+/* ── GOAL PLAN OVERLAY ── */
+#goal-plan{
+  position:fixed;inset:0;z-index:860;display:none;flex-direction:column;
+  background:var(--bg);padding:calc(var(--safe-top) + 14px) 16px calc(var(--safe-bot) + 16px);
+}
+#goal-plan.open{display:flex}
+.gp-header{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-shrink:0}
+.gp-back{background:none;border:none;color:var(--t2);font-size:22px;padding:4px 8px 4px 0;cursor:pointer}
+.gp-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;line-height:1}
+.gp-phase{font-size:10px;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;margin-top:3px}
+.gp-form{display:flex;flex-direction:column;gap:12px;margin-bottom:4px}
+.gp-chat{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:9px;scrollbar-width:none;margin-bottom:10px;padding-bottom:4px}
+.gp-chat::-webkit-scrollbar{display:none}
+.gp-thinking{font-size:12px;color:var(--t3);font-style:italic;padding:6px 0}
+.gp-lock-btn{
+  display:none;width:100%;padding:15px;border:none;border-radius:12px;
+  font-size:15px;font-weight:600;cursor:pointer;margin-bottom:8px;
+  background:var(--g1);color:#0a0a0a;transition:all .2s;
+}
+.gp-lock-btn.show{display:block}
+.gp-lock-btn:active{transform:scale(.98)}
+.gp-send-row{display:flex;gap:8px;flex-shrink:0}
+.gp-send-row input{flex:1}
+
+/* ── GOAL HEADER ROW ── */
+.goals-header-row{display:flex;align-items:center;justify-content:space-between;padding:14px 20px 7px}
+.goals-header-title{font-size:10px;font-weight:500;color:var(--t3);letter-spacing:1.8px;text-transform:uppercase}
+.add-goal-btn{
+  display:flex;align-items:center;gap:4px;padding:5px 12px;
+  background:var(--elevated);border:1px solid var(--border2);border-radius:20px;
+  font-size:12px;color:var(--t2);cursor:pointer;transition:all .2s;
+}
+.add-goal-btn:active{opacity:.7}
+
+/* ── GOAL TASKS BADGE ── */
+.goal-tasks-tag{
+  display:inline-flex;align-items:center;gap:3px;margin-top:3px;
+  font-size:10px;color:var(--t3);
+}
 </style>
 </head>
 <body>
@@ -389,7 +429,10 @@ textarea.inp{resize:none;line-height:1.55}
 
     <!-- ══ GOALS ══ -->
     <div id="screen-goals" class="screen">
-      <div class="sh">Your 5 Goals</div>
+      <div class="goals-header-row">
+        <span class="goals-header-title">Your Goals</span>
+        <button class="add-goal-btn" onclick="openGoalPlan()">＋ New Goal</button>
+      </div>
       <div id="goals-list"></div>
 
       <div class="sh" style="margin-top:6px">Live Numbers</div>
@@ -582,6 +625,44 @@ textarea.inp{resize:none;line-height:1.55}
 
 </div><!-- /app -->
 
+<!-- GOAL PLANNING OVERLAY -->
+<div id="goal-plan">
+  <div class="gp-header">
+    <button class="gp-back" onclick="closeGoalPlan()">←</button>
+    <div>
+      <div class="gp-title">New Goal</div>
+      <div class="gp-phase" id="gp-phase">Define it</div>
+    </div>
+  </div>
+
+  <!-- Step 1: Form -->
+  <div class="gp-form" id="gp-form">
+    <div class="frow">
+      <div class="lbl">What's the goal?</div>
+      <input type="text" class="inp" id="gp-name" placeholder="e.g. Buy a Land Rover Defender">
+    </div>
+    <div class="frow">
+      <div class="lbl">What does success look like?</div>
+      <input type="text" class="inp" id="gp-target" placeholder="e.g. Own a Defender 90 fully paid">
+    </div>
+    <div class="frow">
+      <div class="lbl">By which day of your 500?</div>
+      <input type="number" class="inp" id="gp-day" placeholder="e.g. 300" min="1" max="500">
+    </div>
+    <button class="btn-main" style="margin:4px 0 0" onclick="startGoalVetting()">Talk to AI Coach →</button>
+  </div>
+
+  <!-- Step 2: AI Vetting Chat -->
+  <div class="gp-chat" id="gp-chat" style="display:none"></div>
+  <div id="gp-input-area" style="display:none;flex-shrink:0">
+    <button class="gp-lock-btn" id="gp-lock" onclick="lockInGoal()">🎯 Lock In This Goal</button>
+    <div class="gp-send-row">
+      <input type="text" class="inp" id="gp-inp" placeholder="Reply to your coach..." onkeydown="if(event.key==='Enter')sendGoalMsg()">
+      <button class="btn-send" onclick="sendGoalMsg()">→</button>
+    </div>
+  </div>
+</div>
+
 <!-- CELEBRATION OVERLAY -->
 <div id="cel">
   <div class="cel-bg" onclick="closeCel()"></div>
@@ -623,7 +704,8 @@ const S = {
   cel: { first: false, half: false, all: false },
   metricsHistory: [],
   recentLogs: [],
-  recentWins: []
+  recentWins: [],
+  goalPlan: { name:'', target:'', day:500, hist:[], readyToLock:false }
 };
 
 // ═══════════════════════════════════════════════════════
@@ -921,32 +1003,50 @@ async function buildDay() {
   const counts = { fired_up:15, focused:12, steady:10, tired:7, rough:4 };
   const n = counts[S.mood] || 10;
 
-  const prompt = `Generate a personalised daily task list for Eby on Day ${S.dayNum} of his 500-day system.
-Mood: ${S.mood}${sit ? '\nSituation: ' + sit : ''}
+  // ── Trajectory Engine: calculate where each goal should be vs where it is ──
+  const trajectories = S.goals.map(g => {
+    const expected = Math.round((S.dayNum / 500) * 100);
+    const actual = g.progress || 0;
+    const gap = actual - expected;
+    const status = gap >= 5 ? '✅ ahead' : gap >= -5 ? '⚡ on track' : gap >= -15 ? '⚠️ slightly behind' : '🔴 behind';
+    const targetDay = g.target_day || 500;
+    const daysLeft = targetDay - S.dayNum;
+    const dailyTasks = g.daily_tasks ? JSON.parse(g.daily_tasks) : [];
+    return { name:g.name, actual, expected, status, daysLeft, dailyTasks };
+  });
+  const trajectoryStr = trajectories.map(t =>
+    `• ${t.name}: ${t.actual}% actual vs ${t.expected}% expected — ${t.status} (${t.daysLeft} days to target)${t.dailyTasks.length ? '\n  Atomic tasks: ' + t.dailyTasks.map(x=>x.title).join(' | ') : ''}`
+  ).join('\n');
 
-Return ONLY valid JSON array — no markdown, no extra text, no code block.
-Exactly ${n} tasks. Each task:
+  const prompt = `You are Eby's AI life coach. Build his Day ${S.dayNum} task list following ATOMIC HABITS principles.
+
+MOOD: ${S.mood}${sit ? '\nSITUATION: ' + sit : ''}
+
+GOAL TRAJECTORY (500-day system):
+${trajectoryStr}
+
+ATOMIC HABITS RULES — apply every task:
+1. Make it TINY: use the 2-minute rule — smallest version that counts (not "workout", but "do 5 pushups")
+2. Habit STACK: attach new behaviours to existing ones (e.g. "after morning coffee, do...")
+3. Implementation INTENTION: be specific — when, where, how (not "meditate", but "sit in chair at 7am for 5 min")
+4. Identity: frame as who Eby IS becoming ("I am someone who...")
+5. Prioritise LAGGING goals in today's task allocation
+
+Return ONLY valid JSON array. Exactly ${n} tasks:
 {
-  "id": "t1" (unique, sequential),
-  "title": "action verb + object, max 7 words, never an outcome",
-  "category": "mind" | "skills" | "body" | "network" | "business",
-  "duration": "X min" or "daily" or "any",
-  "goal_id": 1-5,
-  "min_viable": true (only for the 3 simplest tasks)
+  "id": "t1",
+  "title": "specific micro-action, max 8 words",
+  "category": "mind"|"skills"|"body"|"network"|"business",
+  "duration": "X min",
+  "goal_id": 1-${Math.max(5, S.goals.length)},
+  "min_viable": true (mark 3 smallest tasks only),
+  "habit_stack": "after [existing habit]" or null
 }
 
-Source habits to draw from:
-MIND (goal 5): Guided visualisation 10min | EFT 10min | Gratitude 3 things | Affirmations 5min | Read 5 pages
-SKILLS (goal 4): English training 15min | Etiquette/world tip | Style check
-BODY (goal 3): Any workout | Kaggle exercises daily | Supplements + diet | Skincare morning | Face exercise 5min
-NETWORK (goal 2): Send 10 reach-out messages | 1 genuine conversation | 1 BNI action
-BUSINESS (goal 1): Post Higgsfield content | Club Catalyst 10 actions | Improve Adivinar process | Finance concept | Weekly review
-
-For "${S.mood}" day, weight tasks accordingly.
-Mark exactly 3 tasks min_viable:true — the three smallest, fastest actions.`;
+Allocate more tasks to goals that are BEHIND pace. Mark 3 most essential tasks as min_viable:true.`;
 
   try {
-    const res = await ai(prompt, {}, 1500);
+    const res = await ai(prompt, {}, 1800);
     const m = res.match(/\[[\s\S]*\]/);
     if (!m) throw new Error('no json');
     S.tasks = JSON.parse(m[0]);
@@ -1082,13 +1182,29 @@ function renderGoalsList() {
     id:i+1, name:n, target:['₹100Cr personal net worth','Master connector + ecosystem builder','Greek god physique + 50-partner pool','1M+ followers — Malayalam first','Extraordinary life + relationship truth'][i], progress:1
   }));
   document.getElementById('goals-list').innerHTML = goals.map((g, i) => {
-    const c = GC[i], p = g.progress || 0;
+    const c = GC[i % GC.length];   // cycle colors for goals beyond 5
+    const p = g.progress || 0;
+    // Daily tasks badge
+    let tasksBadge = '';
+    if (g.daily_tasks) {
+      try {
+        const tasks = JSON.parse(g.daily_tasks);
+        if (tasks.length) {
+          tasksBadge = `<div class="goal-tasks-tag">⚡ ${tasks.length} atomic tasks active</div>`;
+        }
+      } catch(e) {}
+    }
+    // Target day indicator
+    const tDay = g.target_day || 500;
+    const daysLeft = tDay - S.dayNum;
+    const dayBadge = daysLeft > 0 ? `<span style="font-size:10px;color:var(--t3);margin-left:6px">Day ${tDay}</span>` : '';
     return `<div class="goal-card">
       <div class="goal-top" onclick="toggleGoal(${g.id})">
         <div class="goal-bar" style="background:${c}"></div>
         <div class="goal-info">
-          <div class="goal-name">${g.name}</div>
+          <div class="goal-name">${g.name}${dayBadge}</div>
           <div class="goal-tgt">${g.target}</div>
+          ${tasksBadge}
         </div>
         <div class="goal-pct" style="color:${c}">${p}%</div>
       </div>
@@ -1352,6 +1468,169 @@ async function loadWins() {
       </div>
     </div>`;
   }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// GOAL PLANNING FLOW
+// ═══════════════════════════════════════════════════════
+function openGoalPlan() {
+  S.goalPlan = { name:'', target:'', day:500, hist:[], readyToLock:false };
+  document.getElementById('gp-name').value = '';
+  document.getElementById('gp-target').value = '';
+  document.getElementById('gp-day').value = '';
+  document.getElementById('gp-form').style.display = 'flex';
+  document.getElementById('gp-chat').style.display = 'none';
+  document.getElementById('gp-chat').innerHTML = '';
+  document.getElementById('gp-input-area').style.display = 'none';
+  document.getElementById('gp-lock').classList.remove('show');
+  document.getElementById('gp-phase').textContent = 'Define it';
+  document.getElementById('goal-plan').classList.add('open');
+}
+
+function closeGoalPlan() {
+  document.getElementById('goal-plan').classList.remove('open');
+  S.goalPlan = { name:'', target:'', day:500, hist:[], readyToLock:false };
+}
+
+function gpBubble(text, role) {
+  const div = document.createElement('div');
+  div.className = `msg ${role === 'user' ? 'u' : 'a'}`;
+  div.textContent = text;
+  const chat = document.getElementById('gp-chat');
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  return div;
+}
+
+async function startGoalVetting() {
+  const name   = document.getElementById('gp-name').value.trim();
+  const target = document.getElementById('gp-target').value.trim();
+  const day    = parseInt(document.getElementById('gp-day').value) || 500;
+  if (!name) { showToast('Give your goal a name first'); return; }
+  S.goalPlan = { name, target, day, hist:[], readyToLock:false };
+
+  // Switch to chat view
+  document.getElementById('gp-form').style.display = 'none';
+  document.getElementById('gp-chat').style.display = 'flex';
+  document.getElementById('gp-input-area').style.display = 'block';
+  document.getElementById('gp-phase').textContent = 'AI vetting';
+
+  const thinking = gpBubble('Thinking...', 'ai');
+  thinking.classList.add('gp-thinking');
+
+  const existingGoals = S.goals.map(g => `• ${g.name} (${g.progress||0}%)`).join('\n');
+  const daysLeft = day - S.dayNum;
+
+  const systemPrompt = `You are Eby's brutally honest but warm AI life coach. Eby just created a new goal and you must vet it rigorously before he locks it in.
+
+EBY'S EXISTING GOALS:
+${existingGoals || '(none yet)'}
+
+NEW GOAL: "${name}"
+TARGET OUTCOME: ${target || '(not specified)'}
+TARGET: Day ${day} of 500 (${daysLeft} days from now, currently Day ${S.dayNum})
+
+Conduct a 3-5 message accountability conversation covering:
+1. Specificity — is the outcome measurable?
+2. Conflicts — does it clash with existing goals (time, money, energy)?
+3. Realism — is Day ${day} achievable? What's missing?
+4. Identity — Atomic Habits: "who do you want to become?" (not just what you want to have/do)
+
+When satisfied, end your final message with exactly: [READY_TO_LOCK]
+
+Start with ONE sharp clarifying question. Be direct, warm, max 3 sentences.`;
+
+  try {
+    const reply = await ai(systemPrompt, { goalVetting:true }, 400);
+    thinking.remove();
+    const clean = reply.replace('[READY_TO_LOCK]', '').trim();
+    gpBubble(clean, 'ai');
+    S.goalPlan.hist.push({ role:'user', content:`New goal: ${name}. Target outcome: ${target}. Target day: ${day}` });
+    S.goalPlan.hist.push({ role:'assistant', content:reply });
+    if (reply.includes('[READY_TO_LOCK]')) {
+      document.getElementById('gp-lock').classList.add('show');
+      document.getElementById('gp-phase').textContent = 'Ready to lock';
+      S.goalPlan.readyToLock = true;
+    }
+  } catch(e) {
+    thinking.textContent = 'Coach is offline — but you can still lock in this goal when ready.';
+    document.getElementById('gp-lock').classList.add('show');
+  }
+}
+
+async function sendGoalMsg() {
+  const inp  = document.getElementById('gp-inp');
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = '';
+  gpBubble(text, 'user');
+
+  const thinking = gpBubble('Thinking...', 'ai');
+  thinking.classList.add('gp-thinking');
+
+  // Append brief instruction hint to user message (keeps history alternating correctly)
+  const msg = `${text}\n\n[Vetting goal: "${S.goalPlan.name}" Day ${S.goalPlan.day}. Reply 2-3 sentences. End with [READY_TO_LOCK] when satisfied.]`;
+
+  try {
+    const reply = await ai(msg, { goalVetting:true }, 350, S.goalPlan.hist);
+    thinking.remove();
+    const clean = reply.replace('[READY_TO_LOCK]', '').trim();
+    gpBubble(clean, 'ai');
+    // Push AFTER the API call so history stays properly alternating
+    S.goalPlan.hist.push({ role:'user', content:text });
+    S.goalPlan.hist.push({ role:'assistant', content:reply });
+    if (reply.includes('[READY_TO_LOCK]')) {
+      document.getElementById('gp-lock').classList.add('show');
+      document.getElementById('gp-phase').textContent = 'Ready to lock';
+      S.goalPlan.readyToLock = true;
+    }
+  } catch(e) {
+    thinking.textContent = 'Network error. You can still lock in the goal.';
+    document.getElementById('gp-lock').classList.add('show');
+  }
+}
+
+async function lockInGoal() {
+  const btn = document.getElementById('gp-lock');
+  btn.disabled = true; btn.textContent = 'Locking in...';
+
+  // 1. Generate 5 atomic daily tasks for this goal
+  const atomicPrompt = `Goal: "${S.goalPlan.name}" — Target: "${S.goalPlan.target}" — Due Day ${S.goalPlan.day} of 500.
+Generate 5 atomic micro-tasks following ATOMIC HABITS (2-minute rule, habit stacking, specific implementation intentions).
+Return ONLY valid JSON array:
+[{"id":"at1","title":"specific micro-action max 8 words","duration":"X min","habit_stack":"after [existing habit] or null"}]`;
+
+  let dailyTasks = [];
+  try {
+    const res = await ai(atomicPrompt, {}, 600);
+    const m = res.match(/\[[\s\S]*\]/);
+    if (m) dailyTasks = JSON.parse(m[0]);
+  } catch(e) {}
+
+  // 2. Save to Supabase goals table
+  const goalRow = {
+    name:        S.goalPlan.name,
+    target:      S.goalPlan.target || S.goalPlan.name,
+    progress:    0,
+    target_day:  S.goalPlan.day,
+    daily_tasks: dailyTasks.length ? JSON.stringify(dailyTasks) : null,
+    created_at:  new Date().toISOString(),
+    updated_at:  new Date().toISOString()
+  };
+
+  try {
+    const { data, error } = await S.db.from('goals').insert(goalRow).select().single();
+    if (!error && data) S.goals.push(data);
+    else S.goals.push({ ...goalRow, id: Date.now() });
+  } catch(e) {
+    S.goals.push({ ...goalRow, id: Date.now() });
+  }
+
+  renderGoalsList();
+  renderStrip();
+  const gpName = S.goalPlan.name;
+  closeGoalPlan();
+  cel('🎯', 'Goal Locked!', `"${gpName}" is live. Your daily tasks will now support this goal every single day.`);
 }
 
 // ═══════════════════════════════════════════════════════
