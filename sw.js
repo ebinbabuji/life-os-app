@@ -1,5 +1,5 @@
 // Life OS Service Worker — v2
-const CACHE = 'life-os-v4';
+const CACHE = 'life-os-v5';
 const SHELL = ['/', '/index.html', '/manifest.json'];
 
 // Install: cache app shell
