@@ -377,6 +377,19 @@ textarea.inp{resize:none;line-height:1.55}
 }
 .add-goal-btn:active{opacity:.7}
 
+/* ── GOAL NOTES ── */
+.goal-notes-section{border-top:1px solid var(--border);margin-top:12px;padding-top:12px}
+.goal-notes-lbl{font-size:10px;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px}
+.goal-note-item{padding:8px 0;border-bottom:1px solid var(--border)}
+.goal-note-item:last-child{border-bottom:none}
+.goal-note-meta{font-size:10px;color:var(--t3);margin-bottom:3px}
+.goal-note-text{font-size:12px;color:var(--t2);line-height:1.6}
+.goal-note-empty{font-size:12px;color:var(--t3);font-style:italic;padding:6px 0}
+.goal-note-add{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.goal-note-add textarea{width:100%;background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:8px 10px;color:var(--text);font-size:12px;line-height:1.5;resize:none;min-height:60px}
+.goal-note-add textarea::placeholder{color:var(--t3)}
+.goal-note-save{align-self:flex-end;font-size:12px;padding:6px 16px;background:var(--elevated);border:1px solid var(--border2);border-radius:8px;color:var(--t2);cursor:pointer}
+
 /* ── GOAL TASKS BADGE ── */
 .goal-tasks-tag{
   display:inline-flex;align-items:center;gap:3px;margin-top:3px;
@@ -1090,10 +1103,18 @@ async function buildDay() {
                     gap < -5  ? 'BEHIND — needs 30% of today\'s tasks' :
                     gap < 5   ? 'ON TRACK — needs 20% of today\'s tasks' :
                                 'AHEAD — needs 10% of today\'s tasks';
-    return { name:g.name, actual, expected, gap, status, daysLeft, dailyTasks, urgency };
+    // Most recent strategy note for this goal
+    let latestNote = null;
+    if (g.goal_notes) {
+      try {
+        const notes = JSON.parse(g.goal_notes);
+        if (notes.length) latestNote = notes[0].text;
+      } catch(e) {}
+    }
+    return { name:g.name, actual, expected, gap, status, daysLeft, dailyTasks, urgency, latestNote };
   });
   const trajectoryStr = trajectories.map(t =>
-    `• ${t.name}: ${t.actual}% actual vs ${t.expected}% expected — ${t.status} → ${t.urgency} (${t.daysLeft} days left)${t.dailyTasks.length ? '\n  Locked atomic tasks: ' + t.dailyTasks.map(x=>x.title).join(' | ') : ''}`
+    `• ${t.name}: ${t.actual}% actual vs ${t.expected}% expected — ${t.status} → ${t.urgency} (${t.daysLeft} days left)${t.dailyTasks.length ? '\n  Locked atomic tasks: ' + t.dailyTasks.map(x=>x.title).join(' | ') : ''}${t.latestNote ? '\n  Latest strategy: ' + t.latestNote : ''}`
   ).join('\n');
 
   // Recent task notes (what Eby actually did vs what was suggested)
@@ -1357,14 +1378,41 @@ function renderGoalsList() {
       <div class="goal-prog"><div class="goal-prog-fill" style="background:${c};width:${p}%"></div></div>
       <div class="goal-edit" id="ge-${g.id}">
         <div class="frow">
+          <div class="lbl">Goal name</div>
+          <input type="text" class="inp" id="gname-${g.id}" value="${g.name}">
+        </div>
+        <div class="frow">
+          <div class="lbl">Success looks like</div>
+          <input type="text" class="inp" id="gt-${g.id}" value="${g.target}">
+        </div>
+        <div class="frow">
           <div class="lbl">Progress %</div>
           <input type="number" class="inp" id="gp-${g.id}" value="${p}" min="0" max="100">
         </div>
         <div class="frow">
-          <div class="lbl">Target</div>
-          <input type="text" class="inp" id="gt-${g.id}" value="${g.target}">
+          <div class="lbl">Target day</div>
+          <input type="number" class="inp" id="gday-${g.id}" value="${g.target_day||500}" min="1" max="500">
         </div>
-        <button class="btn-accent" style="background:${c};width:100%;text-align:center;padding:10px" onclick="saveGoal(${g.id})">Save</button>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <button class="btn-accent" style="background:${c};flex:1;text-align:center;padding:10px" onclick="saveGoal(${g.id})">Save changes</button>
+          <button style="padding:10px 14px;background:none;border:1px solid var(--border2);border-radius:10px;color:var(--t3);font-size:12px;cursor:pointer" onclick="deleteGoal(${g.id})">Delete</button>
+        </div>
+        <!-- Strategy Notes Journal -->
+        <div class="goal-notes-section">
+          <div class="goal-notes-lbl">Strategy Notes</div>
+          <div id="gnotes-${g.id}">
+            ${(()=>{
+              let notes = [];
+              try { notes = g.goal_notes ? JSON.parse(g.goal_notes) : []; } catch(e){}
+              if (!notes.length) return '<div class="goal-note-empty">No notes yet — log your first strategic decision</div>';
+              return notes.slice(0,10).map(n => `<div class="goal-note-item"><div class="goal-note-meta">Day ${n.day} · ${n.date}</div><div class="goal-note-text">${n.text}</div></div>`).join('');
+            })()}
+          </div>
+          <div class="goal-note-add">
+            <textarea id="gnote-inp-${g.id}" placeholder="Log a pivot, insight or strategic decision... (e.g. Switching to English content to target international clients)"></textarea>
+            <button class="goal-note-save" onclick="addGoalNote(${g.id})">Add note ↗</button>
+          </div>
+        </div>
       </div>
     </div>`;
   }).join('');
@@ -1375,14 +1423,57 @@ function toggleGoal(id) {
 }
 
 async function saveGoal(id) {
-  const p = parseInt(document.getElementById('gp-'+id).value) || 0;
-  const t = document.getElementById('gt-'+id).value;
-  await S.db.from('goals').update({ progress:p, target:t, updated_at:new Date().toISOString() }).eq('id', id);
+  const p    = parseInt(document.getElementById('gp-'+id).value) || 0;
+  const t    = document.getElementById('gt-'+id).value;
+  const name = document.getElementById('gname-'+id).value.trim() || t;
+  const tDay = parseInt(document.getElementById('gday-'+id).value) || 500;
+  await S.db.from('goals').update({
+    name, target:t, progress:p, target_day:tDay,
+    updated_at: new Date().toISOString()
+  }).eq('id', id);
   const g = S.goals.find(g => g.id === id);
-  if (g) { g.progress = p; g.target = t; }
+  if (g) { g.name = name; g.progress = p; g.target = t; g.target_day = tDay; }
   renderGoalsList(); renderStrip();
   document.getElementById('ge-'+id).classList.remove('open');
   showToast('Goal updated ✓');
+}
+
+async function addGoalNote(id) {
+  const inp  = document.getElementById('gnote-inp-'+id);
+  const text = inp.value.trim();
+  if (!text) return;
+  const g = S.goals.find(g => g.id === id);
+  if (!g) return;
+  // Build updated notes array
+  let notes = [];
+  try { notes = g.goal_notes ? JSON.parse(g.goal_notes) : []; } catch(e) {}
+  const entry = { date: today(), day: S.dayNum, text };
+  notes.unshift(entry); // newest first
+  notes = notes.slice(0, 50); // keep last 50
+  const notesJson = JSON.stringify(notes);
+  // Save to Supabase
+  await S.db.from('goals').update({
+    goal_notes: notesJson,
+    updated_at: new Date().toISOString()
+  }).eq('id', id);
+  g.goal_notes = notesJson;
+  inp.value = '';
+  // Re-render just the notes section
+  const notesDiv = document.getElementById('gnotes-'+id);
+  if (notesDiv) {
+    notesDiv.innerHTML = notes.slice(0,10).map(n =>
+      `<div class="goal-note-item"><div class="goal-note-meta">Day ${n.day} · ${n.date}</div><div class="goal-note-text">${n.text}</div></div>`
+    ).join('');
+  }
+  showToast('Note saved ✓');
+}
+
+async function deleteGoal(id) {
+  if (!confirm('Delete this goal? This cannot be undone.')) return;
+  await S.db.from('goals').delete().eq('id', id);
+  S.goals = S.goals.filter(g => g.id !== id);
+  renderGoalsList(); renderStrip();
+  showToast('Goal deleted');
 }
 
 function renderMetrics() {
