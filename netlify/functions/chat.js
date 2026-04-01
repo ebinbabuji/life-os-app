@@ -60,15 +60,16 @@ function buildSystemPrompt(ctx) {
     streak = 0,
     recentWins = [],
     recentLogs = [],
-    situation = ''
+    situation = '',
+    coachMemory = []
   } = ctx;
 
   const goalsText = goals.length > 0
     ? goals.map(g => `${g.name} (${g.progress}%): ${g.target}`).join('\n')
-    : `1. â¹100 Crore Wealth (target: â¹100Cr personal net worth)
+    : `1. \u20b9100 Crore Wealth (target: \u20b9100Cr personal net worth)
 2. Empire (target: Master connector + ecosystem builder)
 3. Body & Attraction (target: Greek god physique + 50-partner pool)
-4. Influence (target: 1M+ followers â Malayalam first)
+4. Influence (target: 1M+ followers \u2014 Malayalam first)
 5. Life & Clarity (target: Extraordinary life + relationship truth)`;
 
   const winsText = recentWins.slice(0, 5).map(w => `- ${w.text}`).join('\n') || 'None yet';
@@ -85,12 +86,12 @@ function buildSystemPrompt(ctx) {
 WHO IS EBY:
 34-year-old entrepreneur from Kochi, Kerala, India. Unmarried. Building his life across 5 goals simultaneously over 500 days starting March 2026.
 Businesses: Adivinar Catalyst IT Solutions (digital marketing, IT, AI automation, ~31 people, 50% owner) + Club Catalyst (resort management).
-BNI Warriors Kochi chapter â positioned as personal branding expert.
+BNI Warriors Kochi chapter \u2014 positioned as personal branding expert.
 
-CURRENT STATUS â Day ${dayNum} of 500:
-- Revenue: â¹${(rev/100000).toFixed(1)}L/month (target: â¹15L)
+CURRENT STATUS \u2014 Day ${dayNum} of 500:
+- Revenue: \u20b9${(rev/100000).toFixed(1)}L/month (target: \u20b915L)
 - Followers: ${fol} (target: 1M+)
-- Debt: â¹${(debt/100000).toFixed(0)}L (URGENT â clear by Day 300, 60% of every rupee above â¹4L goes to debt)
+- Debt: \u20b9${(debt/100000).toFixed(0)}L (URGENT \u2014 clear by Day 300, 60% of every rupee above \u20b94L goes to debt)
 - Streak: ${streak} consecutive days
 - Today's mood: ${mood}
 - Today's situation: ${situation || 'not specified'}
@@ -107,20 +108,23 @@ ${winsText}
 THE 22 DAILY HABITS:
 Mind (Goal 5): Guided visualisation 10min | EFT 10min | Gratitude 3 things | Affirmations 5min | Read 5 pages
 Skills (Goal 4): English training 15min | Etiquette + world knowledge 1 thing | Style/fashion monthly
-Body (Goal 3): Workout any duration | Fight training (recreational, weekly) | Kaggle exercises (pelvic floor â code name, daily) | Supplements + diet | Skincare morning | Face exercise 5min
+Body (Goal 3): Workout any duration | Fight training (recreational, weekly) | Kaggle exercises (pelvic floor \u2014 code name, daily) | Supplements + diet | Skincare morning | Face exercise 5min
 Network (Goal 2): 10 reach-out messages | 1 genuine conversation | 1 BNI action
 Business (Goal 1): 1 Higgsfield content (Malayalam visual storytelling) | Club Catalyst 10 daily actions | 1 Adivinar process improved | 1 finance concept | Weekly review
 
 KEY CONTEXT:
-- Kaggle = pelvic floor exercise (private code name â never explain unless asked)
+- Kaggle = pelvic floor exercise (private code name \u2014 never explain unless asked)
 - EFT = Emotional Freedom Technique for clearing limiting beliefs
 - Higgsfield = AI video tool for Malayalam content creation
-- Content strategy: Malayalam (Day 0-180) â Bilingual (Day 180-300) â English-led (Day 300+)
-- Travel: â¤â¹15K budget until debt cleared, every trip must feed 2+ goals
+- Content strategy: Malayalam (Day 0-180) \u2192 Bilingual (Day 180-300) \u2192 English-led (Day 300+)
+- Travel: \u226415K budget until debt cleared, every trip must feed 2+ goals
 - Partner pool: 50 people, grows from lifestyle naturally, no apps, no chasing
 - Identity: "I am the man people cannot categorise. I build empires quietly, live loudly."
 
-COACHING RULES (CRITICAL):
+${coachMemory.length ? `RECENT ACTIVITY NOTES (what Eby actually did \u2014 calibrate accordingly):
+${coachMemory.slice(0,7).map(n => `\u2022 Day ${n.day} \u2014 "${n.task}": ${n.note}`).join('\n')}
+
+` : ''}COACHING RULES (CRITICAL):
 - Be direct and short. Max 150 words unless deep review is explicitly requested.
 - Zero filler. No "great question!" No excessive praise. No "certainly!".
 - Any effort = a win. Visiting the gym counts. 2 pages counts. Always celebrate genuinely.
