@@ -174,6 +174,20 @@ textarea.inp{resize:none;line-height:1.55}
 .t-dur{font-size:10px;color:var(--t3)}
 .t-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
 
+/* ── TASK NOTE AREA ── */
+.task-wrap{margin-bottom:7px;border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+.task-wrap .task{margin-bottom:0;border-radius:0;border:none}
+.t-note-icon{font-size:13px;padding:4px 0 4px 8px;flex-shrink:0;cursor:pointer;opacity:.4;transition:opacity .2s;line-height:1}
+.t-note-icon:active{opacity:1}
+.t-note-icon.has-note{opacity:1;color:var(--g1)}
+.t-note-area{display:none;flex-direction:column;gap:7px;padding:9px 13px 11px;background:var(--elevated);border-top:1px solid var(--border)}
+.t-note-area.open{display:flex}
+.t-note-area textarea{width:100%;background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:8px 10px;color:var(--text);font-size:12px;line-height:1.5;resize:none;min-height:56px}
+.t-note-area textarea::placeholder{color:var(--t3)}
+.t-note-save-btn{align-self:flex-end;font-size:12px;padding:6px 14px;background:var(--card);border:1px solid var(--border2);border-radius:8px;color:var(--t2);cursor:pointer}
+.t-note-preview{font-size:11px;color:var(--t3);font-style:italic;padding:3px 13px 8px;background:var(--elevated);line-height:1.4;border-top:1px solid var(--border)}
+.t-pending-badge{font-size:10px;color:var(--g3);margin-left:5px;font-style:normal}
+
 /* ── CUSTOM TASK ADD ── */
 .ct-row{display:flex;gap:8px;padding:0 16px;margin-bottom:12px}
 .ct-row input{flex:1}
@@ -304,6 +318,24 @@ textarea.inp{resize:none;line-height:1.55}
 .chart-empty{font-size:12px;color:var(--t3);padding:20px 0;text-align:center}
 
 /* ── PWA INSTALL ── */
+.reset-btn{
+  display:flex;align-items:center;gap:4px;padding:5px 10px;
+  background:none;border:1px solid var(--border2);border-radius:20px;
+  font-size:11px;color:var(--t3);cursor:pointer;transition:all .2s;
+}
+.reset-btn:active{color:var(--g3);border-color:var(--g3)}
+.reset-confirm{
+  position:fixed;inset:0;z-index:900;display:none;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.8);padding:24px;
+}
+.reset-confirm.open{display:flex}
+.reset-box{background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:28px 22px;max-width:320px;width:100%;text-align:center}
+.reset-box h3{font-family:'Cormorant Garamond',serif;font-size:22px;margin-bottom:10px}
+.reset-box p{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:22px}
+.reset-box .btn-row{display:flex;gap:10px}
+.reset-box .btn-row button{flex:1;padding:13px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer}
+.reset-cancel{background:var(--elevated);color:var(--t2)}
+.reset-go{background:var(--g3);color:#0a0a0a}
 #install-btn{
   display:none;align-items:center;gap:5px;padding:5px 11px;
   background:var(--elevated);border:1px solid var(--border2);border-radius:20px;
@@ -361,8 +393,9 @@ textarea.inp{resize:none;line-height:1.55}
       <div class="hdr-day" id="hdr-day">Day 1</div>
       <div class="hdr-sub" id="hdr-sub">499 days left · March 2026</div>
     </div>
-    <div style="display:flex;align-items:center;gap:10px">
+    <div style="display:flex;align-items:center;gap:8px">
       <button id="install-btn" onclick="installApp()">📲 Add to Home</button>
+      <button class="reset-btn" onclick="openReset()" title="Reset to Day 1">↺ Day 1</button>
       <div class="hdr-streak">
         <span>🔥</span>
         <span id="hdr-streak-txt">0 day streak</span>
@@ -663,6 +696,18 @@ textarea.inp{resize:none;line-height:1.55}
   </div>
 </div>
 
+<!-- RESET CONFIRM OVERLAY -->
+<div class="reset-confirm" id="reset-confirm">
+  <div class="reset-box">
+    <h3>Reset to Day 1?</h3>
+    <p>This restarts your 500-day clock from today. Your goals, notes, and memories are kept. Streak resets to zero. This cannot be undone.</p>
+    <div class="btn-row">
+      <button class="reset-cancel" onclick="closeReset()">Cancel</button>
+      <button class="reset-go" onclick="confirmReset()">Yes, restart</button>
+    </div>
+  </div>
+</div>
+
 <!-- CELEBRATION OVERLAY -->
 <div id="cel">
   <div class="cel-bg" onclick="closeCel()"></div>
@@ -705,7 +750,8 @@ const S = {
   metricsHistory: [],
   recentLogs: [],
   recentWins: [],
-  goalPlan: { name:'', target:'', day:500, hist:[], readyToLock:false }
+  goalPlan: { name:'', target:'', day:500, hist:[], readyToLock:false },
+  recentNotes: []
 };
 
 // ═══════════════════════════════════════════════════════
@@ -747,6 +793,10 @@ async function loadSettings() {
   const now = new Date();
   start.setHours(0,0,0,0); now.setHours(0,0,0,0);
   S.dayNum = Math.max(1, Math.floor((now - start) / 86400000) + 1);
+  // Load coach memory (recent task notes)
+  if (data.coach_memory) {
+    try { S.recentNotes = JSON.parse(data.coach_memory); } catch(e) {}
+  }
 }
 
 async function loadGoals() {
@@ -891,7 +941,11 @@ async function installApp() {
 
 async function loadTodayLog() {
   const { data } = await S.db.from('daily_logs').select('*').eq('log_date', today()).single();
-  if (!data) return;
+  if (!data) {
+    // New day — inherit any undone custom tasks from yesterday
+    await inheritPendingTasks();
+    return;
+  }
   S.mood = data.mood;
   S.tasks = data.tasks_done || [];
   S.custom = data.custom_tasks || [];
@@ -902,6 +956,25 @@ async function loadTodayLog() {
   S.cel.half = S.done.size >= Math.floor(total / 2) && total > 1;
   S.cel.all = S.done.size === total && total > 0;
   if (S.tasks.length > 0) showTasks();
+}
+
+async function inheritPendingTasks() {
+  // Find the most recent log and carry over any undone custom tasks
+  const { data } = await S.db.from('daily_logs')
+    .select('custom_tasks, log_date')
+    .order('log_date', { ascending: false })
+    .limit(1)
+    .single();
+  if (!data || !data.custom_tasks) return;
+  const pending = data.custom_tasks.filter(t => !t.done);
+  if (!pending.length) return;
+  // Give fresh IDs so they don't conflict, but mark as persistent
+  S.custom = pending.map(t => ({
+    ...t,
+    id: 'c' + Date.now() + Math.floor(Math.random()*1000),
+    done: false,
+    persistent: true
+  }));
 }
 
 async function saveLog() {
@@ -1000,8 +1073,8 @@ async function buildDay() {
   const sit = document.getElementById('sit-input').value.trim();
   btn.disabled = true; btn.textContent = 'Building your day...';
 
-  const counts = { fired_up:15, focused:12, steady:10, tired:7, rough:4 };
-  const n = counts[S.mood] || 10;
+  const counts = { fired_up:20, focused:15, steady:12, tired:8, rough:5 };
+  const n = counts[S.mood] || 12;
 
   // ── Trajectory Engine: calculate where each goal should be vs where it is ──
   const trajectories = S.goals.map(g => {
@@ -1010,53 +1083,70 @@ async function buildDay() {
     const gap = actual - expected;
     const status = gap >= 5 ? '✅ ahead' : gap >= -5 ? '⚡ on track' : gap >= -15 ? '⚠️ slightly behind' : '🔴 behind';
     const targetDay = g.target_day || 500;
-    const daysLeft = targetDay - S.dayNum;
-    const dailyTasks = g.daily_tasks ? JSON.parse(g.daily_tasks) : [];
-    return { name:g.name, actual, expected, status, daysLeft, dailyTasks };
+    const daysLeft = Math.max(1, targetDay - S.dayNum);
+    const dailyTasks = g.daily_tasks ? (()=>{ try{ return JSON.parse(g.daily_tasks); }catch(e){ return []; } })() : [];
+    // Task budget: lagging goals get heavier weighting
+    const urgency = gap < -15 ? 'CRITICAL — needs 40% of today\'s tasks' :
+                    gap < -5  ? 'BEHIND — needs 30% of today\'s tasks' :
+                    gap < 5   ? 'ON TRACK — needs 20% of today\'s tasks' :
+                                'AHEAD — needs 10% of today\'s tasks';
+    return { name:g.name, actual, expected, gap, status, daysLeft, dailyTasks, urgency };
   });
   const trajectoryStr = trajectories.map(t =>
-    `• ${t.name}: ${t.actual}% actual vs ${t.expected}% expected — ${t.status} (${t.daysLeft} days to target)${t.dailyTasks.length ? '\n  Atomic tasks: ' + t.dailyTasks.map(x=>x.title).join(' | ') : ''}`
+    `• ${t.name}: ${t.actual}% actual vs ${t.expected}% expected — ${t.status} → ${t.urgency} (${t.daysLeft} days left)${t.dailyTasks.length ? '\n  Locked atomic tasks: ' + t.dailyTasks.map(x=>x.title).join(' | ') : ''}`
+  ).join('\n');
+
+  // Recent task notes (what Eby actually did vs what was suggested)
+  const notesStr = (S.recentNotes || []).slice(0, 7).map(n =>
+    `• Day ${n.day} — "${n.task}": ${n.note}`
   ).join('\n');
 
   const prompt = `You are Eby's AI life coach. Build his Day ${S.dayNum} task list following ATOMIC HABITS principles.
 
 MOOD: ${S.mood}${sit ? '\nSITUATION: ' + sit : ''}
 
-GOAL TRAJECTORY (500-day system):
+GOAL TRAJECTORY (500-day system — allocate task budget by urgency %):
 ${trajectoryStr}
+${notesStr ? `\nACTUAL ACTIVITY NOTES (calibrate task intensity from this):\n${notesStr}` : ''}
 
-ATOMIC HABITS RULES — apply every task:
-1. Make it TINY: use the 2-minute rule — smallest version that counts (not "workout", but "do 5 pushups")
-2. Habit STACK: attach new behaviours to existing ones (e.g. "after morning coffee, do...")
-3. Implementation INTENTION: be specific — when, where, how (not "meditate", but "sit in chair at 7am for 5 min")
-4. Identity: frame as who Eby IS becoming ("I am someone who...")
-5. Prioritise LAGGING goals in today's task allocation
+MANDATORY TASK — include this every single day, no exceptions:
+• "Learn 1 AI tool, concept or use-case for 15 min" — category: skills, goal_id: 1, habit_stack: "after morning coffee"
+
+ATOMIC HABITS RULES — apply to every task:
+1. TINY: 2-minute rule — smallest version that counts
+2. STACK: attach to existing habits ("after [habit], I will...")
+3. INTENTION: specific when/where/how
+4. IDENTITY: who Eby is BECOMING, not just what he's doing
+5. DEEP WORK: include at least 1 task of 60-90 min on the most lagging goal (mark as min_viable:false)
 
 Return ONLY valid JSON array. Exactly ${n} tasks:
 {
   "id": "t1",
-  "title": "specific micro-action, max 8 words",
+  "title": "specific action, max 8 words",
   "category": "mind"|"skills"|"body"|"network"|"business",
   "duration": "X min",
   "goal_id": 1-${Math.max(5, S.goals.length)},
-  "min_viable": true (mark 3 smallest tasks only),
+  "min_viable": true (mark 3 essential tasks only),
   "habit_stack": "after [existing habit]" or null
 }
 
-Allocate more tasks to goals that are BEHIND pace. Mark 3 most essential tasks as min_viable:true.`;
+CRITICAL: Follow the urgency % allocation above strictly. Include 1 deep work block (60-90 min) on the most lagging goal.`;
 
   try {
-    const res = await ai(prompt, {}, 1800);
+    const res = await ai(prompt, { coachMemory: S.recentNotes || [] }, 1800);
     const m = res.match(/\[[\s\S]*\]/);
     if (!m) throw new Error('no json');
     S.tasks = JSON.parse(m[0]);
-    S.custom = []; S.done = new Set();
+    // Keep any undone custom tasks (they carry over until completed)
+    S.custom = S.custom.filter(t => !S.done.has(t.id));
+    S.done = new Set();
     S.cel = { first:false, half:false, all:false };
     showTasks();
     await saveLog();
   } catch (e) {
     S.tasks = fallbackTasks(n);
-    S.custom = []; S.done = new Set();
+    S.custom = S.custom.filter(t => !S.done.has(t.id));
+    S.done = new Set();
     S.cel = { first:false, half:false, all:false };
     showTasks();
     await saveLog();
@@ -1102,18 +1192,74 @@ function renderTasks() {
   document.getElementById('task-list').innerHTML = all.map(t => {
     const done = S.done.has(t.id);
     const color = GC[(t.goal_id||1)-1] || '#888';
-    return `<div class="task ${done?'done':''}" id="tk-${t.id}" onclick="toggleTask('${t.id}')">
-      <div class="t-check">${done?'✓':''}</div>
-      <div class="t-body">
-        <div class="t-title">${t.title}</div>
-        <div class="t-meta">
-          <span class="t-cat">${t.category||''}</span>
-          ${t.duration ? `<span class="t-dur">${t.duration}</span>` : ''}
+    const isCustom = S.custom.some(c => c.id === t.id);
+    const pendingBadge = isCustom && !done ? `<span class="t-pending-badge">↺ carries over</span>` : '';
+    const noteIcon = `<span class="t-note-icon${t.note?' has-note':''}" onclick="event.stopPropagation();toggleNote('${t.id}')" title="Add note">📝</span>`;
+    const notePreview = t.note ? `<div class="t-note-preview">📝 ${t.note}</div>` : '';
+    return `<div class="task-wrap" id="tw-${t.id}">
+      <div class="task ${done?'done':''}" id="tk-${t.id}" onclick="toggleTask('${t.id}')">
+        <div class="t-check">${done?'✓':''}</div>
+        <div class="t-body">
+          <div class="t-title">${t.title}${pendingBadge}</div>
+          <div class="t-meta">
+            <span class="t-cat">${t.category||''}</span>
+            ${t.duration ? `<span class="t-dur">${t.duration}</span>` : ''}
+            ${t.habit_stack ? `<span class="t-dur" style="color:var(--g1)">⚡ ${t.habit_stack}</span>` : ''}
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
+          ${noteIcon}
+          <div class="t-dot" style="background:${color}"></div>
         </div>
       </div>
-      <div class="t-dot" style="background:${color}"></div>
+      ${notePreview}
+      <div class="t-note-area" id="tn-${t.id}">
+        <textarea id="note-inp-${t.id}" placeholder="What did you actually do? (e.g. Did full gym 1.5hr instead of 5 pushups — updates your AI memory)">${t.note||''}</textarea>
+        <button class="t-note-save-btn" onclick="saveTaskNote('${t.id}')">Save to memory ↗</button>
+      </div>
     </div>`;
   }).join('');
+}
+
+function toggleNote(id) {
+  const area = document.getElementById('tn-'+id);
+  if (!area) return;
+  area.classList.toggle('open');
+  if (area.classList.contains('open')) {
+    setTimeout(() => { const inp = document.getElementById('note-inp-'+id); if (inp) inp.focus(); }, 120);
+  }
+}
+
+async function saveTaskNote(id) {
+  const inp = document.getElementById('note-inp-'+id);
+  if (!inp) return;
+  const note = inp.value.trim();
+
+  // Update note in the task object
+  const task = [...S.tasks, ...S.custom].find(t => t.id === id);
+  if (task) task.note = note;
+
+  // Close note area and re-render
+  const area = document.getElementById('tn-'+id);
+  if (area) area.classList.remove('open');
+  renderTasks();
+
+  // Save log (note is now inside the task object)
+  await saveLog();
+
+  // Update coach memory in settings (rolling last 30 notes)
+  if (note && task) {
+    const entry = { date: today(), day: S.dayNum, task: task.title, note };
+    const mem = S.recentNotes || [];
+    mem.unshift(entry);
+    S.recentNotes = mem.slice(0, 30);
+    await S.db.from('settings').update({
+      coach_memory: JSON.stringify(S.recentNotes),
+      updated_at: new Date().toISOString()
+    }).eq('id', 1);
+  }
+
+  showToast('Saved to memory ✓');
 }
 
 async function toggleTask(id) {
@@ -1156,10 +1302,10 @@ function addCustomTask() {
   const inp = document.getElementById('ct-input');
   const txt = inp.value.trim();
   if (!txt) return;
-  S.custom.push({ id:'c'+Date.now(), title:txt, category:'custom', duration:'', goal_id:null, done:false });
+  S.custom.push({ id:'c'+Date.now(), title:txt, category:'custom', duration:'', goal_id:null, done:false, persistent:true });
   inp.value = '';
   renderTasks(); updateProg(); saveLog();
-  showToast('Task added');
+  showToast('Task added — carries over until done');
 }
 
 function resetDay() {
@@ -1468,6 +1614,46 @@ async function loadWins() {
       </div>
     </div>`;
   }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// RESET TO DAY 1
+// ═══════════════════════════════════════════════════════
+function openReset() {
+  document.getElementById('reset-confirm').classList.add('open');
+}
+function closeReset() {
+  document.getElementById('reset-confirm').classList.remove('open');
+}
+async function confirmReset() {
+  closeReset();
+  try {
+    const newStart = today();
+    await S.db.from('settings').update({
+      start_date: newStart,
+      streak: 0,
+      last_active_date: null,
+      updated_at: new Date().toISOString()
+    }).eq('id', 1);
+    S.streak = 0;
+    S.settings.streak = 0;
+    S.settings.start_date = newStart;
+    S.dayNum = 1;
+    // Clear today's log so it's a fresh start
+    await S.db.from('daily_logs').delete().eq('log_date', today());
+    S.tasks = []; S.custom = []; S.done = new Set();
+    S.mood = null;
+    // Reset UI
+    document.getElementById('today-setup').style.display = 'block';
+    document.getElementById('today-tasks').style.display = 'none';
+    document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('on'));
+    document.getElementById('build-btn').disabled = true;
+    updateHeader();
+    renderStrip();
+    cel('🌅', 'Day 1 — New Beginning', 'The clock resets. Same goals, fresh momentum. Let\'s build this properly.');
+  } catch(e) {
+    showToast('Reset failed — try again');
+  }
 }
 
 // ═══════════════════════════════════════════════════════
